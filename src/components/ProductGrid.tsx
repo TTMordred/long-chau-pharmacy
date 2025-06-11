@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { ShoppingCart, Heart, Star, Prescription } from 'lucide-react';
+import { ShoppingCart, Heart, Star, Pill } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -83,7 +83,7 @@ const ProductGrid = ({ onProductClick, onAddToCart, searchQuery, categoryFilter 
             <div className="absolute top-3 left-3 flex flex-col gap-2">
               {product.prescription_required && (
                 <Badge className="bg-red-500 text-white text-xs px-2 py-1">
-                  <Prescription className="w-3 h-3 mr-1" />
+                  <Pill className="w-3 h-3 mr-1" />
                   Rx Required
                 </Badge>
               )}

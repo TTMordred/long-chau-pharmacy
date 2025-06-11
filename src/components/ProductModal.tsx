@@ -1,6 +1,5 @@
-
 import { useState } from 'react';
-import { X, Plus, Minus, Star, Upload, Prescription, ShoppingCart, Heart } from 'lucide-react';
+import { X, Plus, Minus, Star, Upload, Pill, ShoppingCart, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -66,7 +65,7 @@ const ProductModal = ({ product, onClose, onAddToCart }: ProductModalProps) => {
                 <div className="absolute top-4 left-4 flex flex-col gap-2">
                   {product.prescription_required && (
                     <Badge className="bg-red-500 text-white">
-                      <Prescription className="w-3 h-3 mr-1" />
+                      <Pill className="w-3 h-3 mr-1" />
                       Prescription Required
                     </Badge>
                   )}
@@ -145,7 +144,7 @@ const ProductModal = ({ product, onClose, onAddToCart }: ProductModalProps) => {
                 {product.prescription_required && (
                   <div className="space-y-3 p-4 bg-blue-50 rounded-lg border border-blue-200">
                     <div className="flex items-center gap-2 text-blue-700">
-                      <Prescription className="w-5 h-5" />
+                      <Pill className="w-5 h-5" />
                       <h3 className="font-semibold">Prescription Required</h3>
                     </div>
                     
