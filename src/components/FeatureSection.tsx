@@ -7,10 +7,10 @@ const FeatureSection = () => {
   return (
     <div className="py-12">
       <div className="text-center mb-12 space-y-4 animate-in fade-in slide-in-from-bottom duration-700">
-        <h2 className="text-3xl md:text-4xl font-bold gradient-text">
+        <h2 className="text-3xl md:text-4xl font-bold text-navy">
           Why Families Choose Long Chau
         </h2>
-        <p className="text-lg text-navy/70 max-w-2xl mx-auto font-medium">
+        <p className="text-lg text-navy/80 max-w-2xl mx-auto font-medium">
           Experience healthcare designed with care, built with trust, and delivered with a smile
         </p>
       </div>
@@ -72,7 +72,7 @@ const FeatureSection = () => {
           ].map((feature, index) => (
             <Card 
               key={feature.title}
-              className="bg-white/80 backdrop-blur-sm border border-mint/50 hover:bg-white/90 hover:shadow-2xl transition-all duration-500 hover:scale-105 group animate-in slide-in-from-right duration-700"
+              className="bg-white/90 backdrop-blur-sm border border-mint/50 hover:bg-white transition-all duration-500 hover:scale-105 group animate-in slide-in-from-right duration-700 shadow-lg hover:shadow-xl"
               style={{ animationDelay: feature.delay }}
             >
               <CardContent className="p-6 flex items-center space-x-4">
@@ -83,7 +83,7 @@ const FeatureSection = () => {
                   <h4 className="font-semibold text-navy group-hover:text-blue transition-colors duration-300">
                     {feature.title}
                   </h4>
-                  <p className="text-sm text-navy/60 leading-relaxed">
+                  <p className="text-sm text-navy/70 leading-relaxed">
                     {feature.desc}
                   </p>
                 </div>
