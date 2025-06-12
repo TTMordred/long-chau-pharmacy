@@ -23,9 +23,9 @@ const FeatureSection = () => {
             backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='4'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
           }}></div>
           
-          <CardContent className="relative z-10 p-8 h-full flex items-center">
-            <div className="flex items-center justify-between w-full">
-              <div className="space-y-6 flex-1">
+          <CardContent className="relative z-10 p-8 h-full">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center h-full min-h-[300px]">
+              <div className="space-y-6">
                 <div className="space-y-3">
                   <div className="inline-flex items-center px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-sm font-medium border border-white/30">
                     <Pill className="w-4 h-4 mr-2" />
@@ -36,7 +36,7 @@ const FeatureSection = () => {
                     <br />
                     <span className="text-mint">In Seconds</span>
                   </h3>
-                  <p className="text-white/90 text-lg leading-relaxed max-w-md">
+                  <p className="text-white/90 text-lg leading-relaxed">
                     Our AI-powered system instantly verifies prescriptions with licensed pharmacists for your safety and peace of mind
                   </p>
                 </div>
@@ -49,12 +49,14 @@ const FeatureSection = () => {
                 </Button>
               </div>
               
-              <div className="hidden lg:block relative">
-                <div className="w-32 h-32 bg-white/20 backdrop-blur-sm rounded-3xl flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform duration-500">
-                  <Upload className="w-16 h-16 text-white/80" />
+              <div className="flex justify-center">
+                <div className="relative">
+                  <div className="w-32 h-32 bg-white/20 backdrop-blur-sm rounded-3xl flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform duration-500">
+                    <Upload className="w-16 h-16 text-white/80" />
+                  </div>
+                  <div className="absolute -top-4 -right-4 w-8 h-8 bg-sage rounded-full animate-ping"></div>
+                  <div className="absolute -bottom-4 -left-4 w-6 h-6 bg-mint rounded-full animate-pulse delay-1000"></div>
                 </div>
-                <div className="absolute -top-4 -right-4 w-8 h-8 bg-sage rounded-full animate-ping"></div>
-                <div className="absolute -bottom-4 -left-4 w-6 h-6 bg-mint rounded-full animate-pulse delay-1000"></div>
               </div>
             </div>
           </CardContent>
