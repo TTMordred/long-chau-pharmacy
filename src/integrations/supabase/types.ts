@@ -9,6 +9,41 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      cart_items: {
+        Row: {
+          created_at: string
+          id: string
+          product_id: string
+          quantity: number
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          product_id: string
+          quantity?: number
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          product_id?: string
+          quantity?: number
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cart_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       categories: {
         Row: {
           color_class: string | null
@@ -257,6 +292,123 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      profiles: {
+        Row: {
+          address: string | null
+          avatar_url: string | null
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+          phone: string | null
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id: string
+          phone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          phone?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_order_items: {
+        Row: {
+          id: string
+          order_id: string
+          product_id: string
+          quantity: number
+          total_price: number
+          unit_price: number
+        }
+        Insert: {
+          id?: string
+          order_id: string
+          product_id: string
+          quantity: number
+          total_price: number
+          unit_price: number
+        }
+        Update: {
+          id?: string
+          order_id?: string
+          product_id?: string
+          quantity?: number
+          total_price?: number
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "user_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_order_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_orders: {
+        Row: {
+          created_at: string
+          delivery_address: string | null
+          id: string
+          notes: string | null
+          payment_method: string | null
+          payment_status: string | null
+          status: string | null
+          stripe_session_id: string | null
+          total_amount: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          delivery_address?: string | null
+          id?: string
+          notes?: string | null
+          payment_method?: string | null
+          payment_status?: string | null
+          status?: string | null
+          stripe_session_id?: string | null
+          total_amount: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          delivery_address?: string | null
+          id?: string
+          notes?: string | null
+          payment_method?: string | null
+          payment_status?: string | null
+          status?: string | null
+          stripe_session_id?: string | null
+          total_amount?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
     }
     Views: {

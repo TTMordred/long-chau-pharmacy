@@ -1,54 +1,24 @@
-
-import { useState } from 'react';
+import React from 'react';
 import ProductGrid from '@/components/ProductGrid';
-import CartSidebar from '@/components/CartSidebar';
 import ProductModal from '@/components/ProductModal';
 import CategoryNav from '@/components/CategoryNav';
 import DashboardHeader from '@/components/DashboardHeader';
 import FeatureSection from '@/components/FeatureSection';
 import HeroSection from '@/components/HeroSection';
 import StatsSection from '@/components/StatsSection';
+import EnhancedCartSidebar from '@/components/EnhancedCartSidebar';
+import { AuthProvider } from '@/hooks/useAuth';
+import { useCart } from '@/hooks/useCart';
+import { useState } from 'react';
 import type { Product } from '@/hooks/useProducts';
 
-interface CartItem extends Product {
-  quantity: number;
-}
-
-const Index = () => {
+const IndexContent = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('All Products');
-
-  const addToCart = (product: Product, quantity = 1) => {
-    setCartItems(prev => {
-      const existingItem = prev.find(item => item.id === product.id);
-      if (existingItem) {
-        return prev.map(item => 
-          item.id === product.id 
-            ? { ...item, quantity: item.quantity + quantity }
-            : item
-        );
-      }
-      return [...prev, { ...product, quantity }];
-    });
-  };
-
-  const updateCartQuantity = (productId: string, newQuantity: number) => {
-    if (newQuantity === 0) {
-      setCartItems(prev => prev.filter(item => item.id !== productId));
-    } else {
-      setCartItems(prev => 
-        prev.map(item => 
-          item.id === productId ? { ...item, quantity: newQuantity } : item
-        )
-      );
-    }
-  };
-
-  const cartTotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  const cartItemsCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  
+  const { cartItemsCount, addToCart } = useCart();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-sage via-mint to-blue/20 relative overflow-hidden">
@@ -88,7 +58,7 @@ const Index = () => {
           <div className="mt-12 space-y-8">
             <div className="flex items-center justify-between">
               <div className="space-y-2">
-                <h2 className="text-3xl font-bold gradient-text">
+                <h2 className="text-3xl font-bold text-navy">
                   {activeCategory === 'All Products' ? 'All Products' : activeCategory}
                 </h2>
                 <p className="text-navy/70 font-medium">Discover our premium health and wellness collection</p>
@@ -107,7 +77,7 @@ const Index = () => {
             
             <ProductGrid 
               onProductClick={setSelectedProduct}
-              onAddToCart={addToCart}
+              onAddToCart={(product, quantity) => addToCart({ product, quantity })}
               searchQuery={searchQuery}
               categoryFilter={activeCategory === 'All Products' ? undefined : activeCategory}
             />
@@ -115,22 +85,27 @@ const Index = () => {
         </div>
       </main>
 
-      <CartSidebar 
+      <EnhancedCartSidebar 
         isOpen={isCartOpen}
         onClose={() => setIsCartOpen(false)}
-        items={cartItems}
-        total={cartTotal}
-        onUpdateQuantity={updateCartQuantity}
       />
 
       {selectedProduct && (
         <ProductModal 
           product={selectedProduct}
           onClose={() => setSelectedProduct(null)}
-          onAddToCart={addToCart}
+          onAddToCart={(product, quantity) => addToCart({ product, quantity })}
         />
       )}
     </div>
+  );
+};
+
+const Index = () => {
+  return (
+    <AuthProvider>
+      <IndexContent />
+    </AuthProvider>
   );
 };
 
