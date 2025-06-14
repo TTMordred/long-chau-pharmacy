@@ -1,46 +1,57 @@
 
 import { useState } from 'react';
-import { ShoppingCart, Heart, Star, Pill } from 'lucide-react';
+import { ShoppingCart, Heart, Star, Pill, Eye, GitCompare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useProducts, type Product } from '@/hooks/useProducts';
-import { Skeleton } from '@/components/ui/skeleton';
+import { useWishlist } from '@/hooks/useWishlist';
+import { useProductComparison } from '@/hooks/useProductComparison';
+import { EnhancedSkeleton, ProductSkeleton } from '@/components/ui/enhanced-skeleton';
+import { useToast } from '@/hooks/use-toast';
 
 interface ProductGridProps {
   onProductClick: (product: Product) => void;
   onAddToCart: (product: Product, quantity?: number) => void;
+  onQuickView: (product: Product) => void;
   searchQuery: string;
   categoryFilter?: string;
 }
 
-const ProductGrid = ({ onProductClick, onAddToCart, searchQuery, categoryFilter }: ProductGridProps) => {
+const ProductGrid = ({ onProductClick, onAddToCart, onQuickView, searchQuery, categoryFilter }: ProductGridProps) => {
   const { data: products = [], isLoading, error } = useProducts(searchQuery, categoryFilter);
-  const [favorites, setFavorites] = useState<Set<string>>(new Set());
+  const { isInWishlist, toggleWishlist } = useWishlist();
+  const { addToComparison, isInComparison, comparisonCount } = useProductComparison();
+  const { toast } = useToast();
 
-  const toggleFavorite = (productId: string) => {
-    const newFavorites = new Set(favorites);
-    if (newFavorites.has(productId)) {
-      newFavorites.delete(productId);
+  const handleAddToComparison = (product: Product, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const success = addToComparison(product);
+    if (success) {
+      toast({
+        title: "Added to comparison",
+        description: `${product.name} has been added to your comparison list.`,
+      });
+    } else if (comparisonCount >= 4) {
+      toast({
+        title: "Comparison limit reached",
+        description: "You can only compare up to 4 products at once.",
+        variant: "destructive",
+      });
     } else {
-      newFavorites.add(productId);
+      toast({
+        title: "Already in comparison",
+        description: "This product is already in your comparison list.",
+        variant: "destructive",
+      });
     }
-    setFavorites(newFavorites);
   };
 
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {Array.from({ length: 8 }).map((_, i) => (
-          <Card key={i} className="overflow-hidden">
-            <Skeleton className="h-48 w-full" />
-            <CardContent className="p-4 space-y-3">
-              <Skeleton className="h-4 w-3/4" />
-              <Skeleton className="h-3 w-1/2" />
-              <Skeleton className="h-4 w-1/4" />
-              <Skeleton className="h-8 w-full" />
-            </CardContent>
-          </Card>
+          <ProductSkeleton key={i} />
         ))}
       </div>
     );
@@ -99,21 +110,49 @@ const ProductGrid = ({ onProductClick, onAddToCart, searchQuery, categoryFilter 
               )}
             </div>
 
-            <Button
-              variant="ghost"
-              size="sm"
-              className={`absolute top-3 right-3 p-2 rounded-full transition-all duration-300 ${
-                favorites.has(product.id) 
-                  ? 'bg-red-500 text-white hover:bg-red-600' 
-                  : 'bg-white/80 hover:bg-white text-gray-600 hover:text-red-500'
-              }`}
-              onClick={(e) => {
-                e.stopPropagation();
-                toggleFavorite(product.id);
-              }}
-            >
-              <Heart className={`w-4 h-4 ${favorites.has(product.id) ? 'fill-current' : ''}`} />
-            </Button>
+            {/* Action buttons */}
+            <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <Button
+                variant="ghost"
+                size="sm"
+                className={`p-2 rounded-full transition-all duration-300 ${
+                  isInWishlist(product.id) 
+                    ? 'bg-red-500 text-white hover:bg-red-600' 
+                    : 'bg-white/80 hover:bg-white text-gray-600 hover:text-red-500'
+                }`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleWishlist(product.id);
+                }}
+              >
+                <Heart className={`w-4 h-4 ${isInWishlist(product.id) ? 'fill-current' : ''}`} />
+              </Button>
+
+              <Button
+                variant="ghost"
+                size="sm"
+                className="p-2 rounded-full bg-white/80 hover:bg-white text-gray-600 hover:text-blue-500 transition-all duration-300"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onQuickView(product);
+                }}
+              >
+                <Eye className="w-4 h-4" />
+              </Button>
+
+              <Button
+                variant="ghost"
+                size="sm"
+                className={`p-2 rounded-full transition-all duration-300 ${
+                  isInComparison(product.id)
+                    ? 'bg-blue-500 text-white hover:bg-blue-600'
+                    : 'bg-white/80 hover:bg-white text-gray-600 hover:text-blue-500'
+                }`}
+                onClick={(e) => handleAddToComparison(product, e)}
+              >
+                <GitCompare className="w-4 h-4" />
+              </Button>
+            </div>
 
             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300" />
           </div>

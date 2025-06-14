@@ -2,6 +2,8 @@
 import React from 'react';
 import ProductGrid from '@/components/ProductGrid';
 import ProductModal from '@/components/ProductModal';
+import ProductQuickView from '@/components/ProductQuickView';
+import ProductComparisonModal from '@/components/ProductComparisonModal';
 import CategoryNav from '@/components/CategoryNav';
 import DashboardHeader from '@/components/DashboardHeader';
 import FeatureSection from '@/components/FeatureSection';
@@ -13,18 +15,24 @@ import { PageTransition } from '@/components/ui/page-transition';
 import { GlassCard } from '@/components/ui/glass-card';
 import { AuthProvider } from '@/hooks/useAuth';
 import { useCart } from '@/hooks/useCart';
+import { useWishlist } from '@/hooks/useWishlist';
+import { useProductComparison } from '@/hooks/useProductComparison';
 import { useState } from 'react';
-import { ShoppingCart, Heart, Search, Plus } from 'lucide-react';
+import { ShoppingCart, Heart, Search, GitCompare } from 'lucide-react';
 import type { Product } from '@/hooks/useProducts';
 
 const IndexContent = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
+  const [showComparison, setShowComparison] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('All Products');
   const [showSearch, setShowSearch] = useState(false);
   
   const { cartItemsCount, addToCart } = useCart();
+  const { wishlistCount } = useWishlist();
+  const { comparisonCount } = useProductComparison();
 
   return (
     <PageTransition variant="fade" duration="normal">
@@ -95,6 +103,7 @@ const IndexContent = () => {
               
               <ProductGrid 
                 onProductClick={setSelectedProduct}
+                onQuickView={setQuickViewProduct}
                 onAddToCart={(product, quantity) => addToCart({ product, quantity })}
                 searchQuery={searchQuery}
                 categoryFilter={activeCategory === 'All Products' ? undefined : activeCategory}
@@ -103,7 +112,7 @@ const IndexContent = () => {
           </div>
         </main>
 
-        {/* Floating Action Buttons */}
+        {/* Enhanced Floating Action Buttons */}
         <FloatingActionButton
           onClick={() => setIsCartOpen(true)}
           position="bottom-right"
@@ -121,15 +130,48 @@ const IndexContent = () => {
           </div>
         </FloatingActionButton>
 
-        <FloatingActionButton
-          onClick={() => setShowSearch(!showSearch)}
-          position="bottom-left"
-          variant="secondary"
-          animation="float"
-          className="shadow-xl hover:shadow-2xl"
-        >
-          <Search className="h-6 w-6" />
-        </FloatingActionButton>
+        <div className="fixed bottom-6 left-6 flex flex-col gap-3 z-50">
+          <FloatingActionButton
+            onClick={() => setShowSearch(!showSearch)}
+            variant="secondary"
+            animation="float"
+            className="shadow-xl hover:shadow-2xl"
+          >
+            <Search className="h-6 w-6" />
+          </FloatingActionButton>
+
+          {wishlistCount > 0 && (
+            <FloatingActionButton
+              onClick={() => {/* TODO: Open wishlist */}}
+              variant="outline"
+              animation="scale"
+              className="shadow-xl hover:shadow-2xl"
+            >
+              <div className="relative">
+                <Heart className="h-6 w-6" />
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                  {wishlistCount}
+                </span>
+              </div>
+            </FloatingActionButton>
+          )}
+
+          {comparisonCount > 0 && (
+            <FloatingActionButton
+              onClick={() => setShowComparison(true)}
+              variant="outline"
+              animation="scale"
+              className="shadow-xl hover:shadow-2xl"
+            >
+              <div className="relative">
+                <GitCompare className="h-6 w-6" />
+                <span className="absolute -top-2 -right-2 bg-blue-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                  {comparisonCount}
+                </span>
+              </div>
+            </FloatingActionButton>
+          )}
+        </div>
 
         <EnhancedCartSidebar 
           isOpen={isCartOpen}
@@ -140,6 +182,21 @@ const IndexContent = () => {
           <ProductModal 
             product={selectedProduct}
             onClose={() => setSelectedProduct(null)}
+            onAddToCart={(product, quantity) => addToCart({ product, quantity })}
+          />
+        )}
+
+        {quickViewProduct && (
+          <ProductQuickView
+            product={quickViewProduct}
+            onClose={() => setQuickViewProduct(null)}
+            onAddToCart={(product, quantity) => addToCart({ product, quantity })}
+          />
+        )}
+
+        {showComparison && (
+          <ProductComparisonModal
+            onClose={() => setShowComparison(false)}
             onAddToCart={(product, quantity) => addToCart({ product, quantity })}
           />
         )}
