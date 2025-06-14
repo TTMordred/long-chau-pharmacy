@@ -9,7 +9,9 @@ import Auth from "./pages/Auth";
 import UploadPrescription from "./pages/UploadPrescription";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import Health from "./pages/Health";
+import HealthPost from "./pages/HealthPost";
 import BlogPosts from "./pages/BlogPosts";
+import BlogPost from "./pages/BlogPost";
 import CMSDashboard from "./pages/CMSDashboard";
 import NotFound from "./pages/NotFound";
 
@@ -27,7 +29,9 @@ const App = () => (
           <Route path="/upload-prescription" element={<UploadPrescription />} />
           <Route path="/payment-success" element={<PaymentSuccess />} />
           <Route path="/health" element={<Health />} />
+          <Route path="/health/:slug" element={<HealthPost />} />
           <Route path="/blog" element={<BlogPosts />} />
+          <Route path="/blog/:slug" element={<BlogPost />} />
           <Route path="/cms-dashboard" element={<CMSDashboard />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

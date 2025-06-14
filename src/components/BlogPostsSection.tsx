@@ -58,88 +58,89 @@ const BlogPostsSection = () => {
         {/* Blog Posts Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-5xl mx-auto mb-8">
           {publishedPosts.map((post, index) => (
-            <Card 
-              key={post.id}
-              className="bg-white/90 backdrop-blur-sm border border-blue/20 hover:border-navy/40 transition-all duration-300 hover:scale-105 group shadow-lg hover:shadow-2xl cursor-pointer"
-              style={{ animationDelay: `${index * 200}ms` }}
-            >
-              <CardContent className="p-0">
-                <div className="lg:flex lg:h-64">
-                  {/* Image Section */}
-                  <div className="lg:w-2/5 relative overflow-hidden">
-                    {post.featured_image_url ? (
-                      <img 
-                        src={post.featured_image_url} 
-                        alt={post.title}
-                        className="w-full h-48 lg:h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                      />
-                    ) : (
-                      <div className="w-full h-48 lg:h-full bg-gradient-to-br from-blue/20 to-navy/30 flex items-center justify-center">
-                        <BookOpen className="w-12 h-12 text-blue/60" />
-                      </div>
-                    )}
-                    {post.category && (
-                      <div className="absolute top-3 left-3">
-                        <span className="px-3 py-1 bg-blue/90 text-white text-xs font-semibold rounded-full">
-                          {post.category.charAt(0).toUpperCase() + post.category.slice(1)}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                  
-                  {/* Content Section */}
-                  <div className="lg:w-3/5 p-6 flex flex-col justify-between">
-                    <div className="space-y-4">
-                      <h3 className="font-bold text-xl text-navy group-hover:text-blue transition-colors duration-300">
-                        {post.title}
-                      </h3>
-                      
-                      {post.excerpt && (
-                        <p className="text-navy/70 leading-relaxed">
-                          {post.excerpt}
-                        </p>
+            <Link key={post.id} to={`/blog/${post.slug}`}>
+              <Card 
+                className="bg-white/90 backdrop-blur-sm border border-blue/20 hover:border-navy/40 transition-all duration-300 hover:scale-105 group shadow-lg hover:shadow-2xl cursor-pointer"
+                style={{ animationDelay: `${index * 200}ms` }}
+              >
+                <CardContent className="p-0">
+                  <div className="lg:flex lg:h-64">
+                    {/* Image Section */}
+                    <div className="lg:w-2/5 relative overflow-hidden">
+                      {post.featured_image_url ? (
+                        <img 
+                          src={post.featured_image_url} 
+                          alt={post.title}
+                          className="w-full h-48 lg:h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                        />
+                      ) : (
+                        <div className="w-full h-48 lg:h-full bg-gradient-to-br from-blue/20 to-navy/30 flex items-center justify-center">
+                          <BookOpen className="w-12 h-12 text-blue/60" />
+                        </div>
                       )}
-                      
-                      {post.tags && post.tags.length > 0 && (
-                        <div className="flex flex-wrap gap-2">
-                          {post.tags.slice(0, 3).map((tag, tagIndex) => (
-                            <span 
-                              key={tagIndex}
-                              className="inline-flex items-center gap-1 px-2 py-1 bg-mint/20 text-navy text-xs rounded-full"
-                            >
-                              <Tag className="w-2 h-2" />
-                              {tag}
-                            </span>
-                          ))}
-                          {post.tags.length > 3 && (
-                            <span className="inline-flex items-center gap-1 px-2 py-1 bg-mint/20 text-navy text-xs rounded-full">
-                              <Tag className="w-2 h-2" />
-                              +{post.tags.length - 3} more
-                            </span>
-                          )}
+                      {post.category && (
+                        <div className="absolute top-3 left-3">
+                          <span className="px-3 py-1 bg-blue/90 text-white text-xs font-semibold rounded-full">
+                            {post.category.charAt(0).toUpperCase() + post.category.slice(1)}
+                          </span>
                         </div>
                       )}
                     </div>
                     
-                    <div className="flex items-center justify-between text-xs text-navy/60 mt-4 pt-4 border-t border-mint/20">
-                      <div className="flex items-center gap-1">
-                        <User className="w-3 h-3" />
-                        <span>Editorial Team</span>
+                    {/* Content Section */}
+                    <div className="lg:w-3/5 p-6 flex flex-col justify-between">
+                      <div className="space-y-4">
+                        <h3 className="font-bold text-xl text-navy group-hover:text-blue transition-colors duration-300">
+                          {post.title}
+                        </h3>
+                        
+                        {post.excerpt && (
+                          <p className="text-navy/70 leading-relaxed">
+                            {post.excerpt}
+                          </p>
+                        )}
+                        
+                        {post.tags && post.tags.length > 0 && (
+                          <div className="flex flex-wrap gap-2">
+                            {post.tags.slice(0, 3).map((tag, tagIndex) => (
+                              <span 
+                                key={tagIndex}
+                                className="inline-flex items-center gap-1 px-2 py-1 bg-mint/20 text-navy text-xs rounded-full"
+                              >
+                                <Tag className="w-2 h-2" />
+                                {tag}
+                              </span>
+                            ))}
+                            {post.tags.length > 3 && (
+                              <span className="inline-flex items-center gap-1 px-2 py-1 bg-mint/20 text-navy text-xs rounded-full">
+                                <Tag className="w-2 h-2" />
+                                +{post.tags.length - 3} more
+                              </span>
+                            )}
+                          </div>
+                        )}
                       </div>
-                      <div className="flex items-center gap-1">
-                        <Calendar className="w-3 h-3" />
-                        <span>
-                          {post.published_at 
-                            ? format(new Date(post.published_at), 'MMM dd, yyyy')
-                            : format(new Date(post.created_at), 'MMM dd, yyyy')
-                          }
-                        </span>
+                      
+                      <div className="flex items-center justify-between text-xs text-navy/60 mt-4 pt-4 border-t border-mint/20">
+                        <div className="flex items-center gap-1">
+                          <User className="w-3 h-3" />
+                          <span>Editorial Team</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Calendar className="w-3 h-3" />
+                          <span>
+                            {post.published_at 
+                              ? format(new Date(post.published_at), 'MMM dd, yyyy')
+                              : format(new Date(post.created_at), 'MMM dd, yyyy')
+                            }
+                          </span>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </Link>
           ))}
         </div>
 

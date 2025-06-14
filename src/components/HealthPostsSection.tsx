@@ -58,62 +58,63 @@ const HealthPostsSection = () => {
         {/* Health Posts Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto mb-8">
           {publishedPosts.map((post, index) => (
-            <Card 
-              key={post.id}
-              className="bg-white/80 backdrop-blur-sm border border-mint/20 hover:border-sage/40 transition-all duration-300 hover:scale-105 group shadow-lg hover:shadow-xl cursor-pointer"
-              style={{ animationDelay: `${index * 200}ms` }}
-            >
-              <CardContent className="p-0">
-                <div className="relative overflow-hidden rounded-t-lg">
-                  {post.featured_image_url ? (
-                    <img 
-                      src={post.featured_image_url} 
-                      alt={post.title}
-                      className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
-                    />
-                  ) : (
-                    <div className="w-full h-48 bg-gradient-to-br from-sage/20 to-mint/30 flex items-center justify-center">
-                      <Heart className="w-12 h-12 text-sage/60" />
-                    </div>
-                  )}
-                  {post.category && (
-                    <div className="absolute top-3 left-3">
-                      <span className="px-3 py-1 bg-sage/90 text-white text-xs font-semibold rounded-full">
-                        {post.category.charAt(0).toUpperCase() + post.category.slice(1).replace('-', ' ')}
-                      </span>
-                    </div>
-                  )}
-                </div>
-                
-                <div className="p-6 space-y-4">
-                  <h3 className="font-bold text-lg text-navy group-hover:text-sage transition-colors duration-300 line-clamp-2">
-                    {post.title}
-                  </h3>
+            <Link key={post.id} to={`/health/${post.slug}`}>
+              <Card 
+                className="bg-white/80 backdrop-blur-sm border border-mint/20 hover:border-sage/40 transition-all duration-300 hover:scale-105 group shadow-lg hover:shadow-xl cursor-pointer"
+                style={{ animationDelay: `${index * 200}ms` }}
+              >
+                <CardContent className="p-0">
+                  <div className="relative overflow-hidden rounded-t-lg">
+                    {post.featured_image_url ? (
+                      <img 
+                        src={post.featured_image_url} 
+                        alt={post.title}
+                        className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
+                      />
+                    ) : (
+                      <div className="w-full h-48 bg-gradient-to-br from-sage/20 to-mint/30 flex items-center justify-center">
+                        <Heart className="w-12 h-12 text-sage/60" />
+                      </div>
+                    )}
+                    {post.category && (
+                      <div className="absolute top-3 left-3">
+                        <span className="px-3 py-1 bg-sage/90 text-white text-xs font-semibold rounded-full">
+                          {post.category.charAt(0).toUpperCase() + post.category.slice(1).replace('-', ' ')}
+                        </span>
+                      </div>
+                    )}
+                  </div>
                   
-                  {post.excerpt && (
-                    <p className="text-navy/70 text-sm leading-relaxed line-clamp-3">
-                      {post.excerpt}
-                    </p>
-                  )}
-                  
-                  <div className="flex items-center justify-between text-xs text-navy/60">
-                    <div className="flex items-center gap-1">
-                      <User className="w-3 h-3" />
-                      <span>Health Expert</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Calendar className="w-3 h-3" />
-                      <span>
-                        {post.published_at 
-                          ? format(new Date(post.published_at), 'MMM dd, yyyy')
-                          : format(new Date(post.created_at), 'MMM dd, yyyy')
-                        }
-                      </span>
+                  <div className="p-6 space-y-4">
+                    <h3 className="font-bold text-lg text-navy group-hover:text-sage transition-colors duration-300 line-clamp-2">
+                      {post.title}
+                    </h3>
+                    
+                    {post.excerpt && (
+                      <p className="text-navy/70 text-sm leading-relaxed line-clamp-3">
+                        {post.excerpt}
+                      </p>
+                    )}
+                    
+                    <div className="flex items-center justify-between text-xs text-navy/60">
+                      <div className="flex items-center gap-1">
+                        <User className="w-3 h-3" />
+                        <span>Health Expert</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Calendar className="w-3 h-3" />
+                        <span>
+                          {post.published_at 
+                            ? format(new Date(post.published_at), 'MMM dd, yyyy')
+                            : format(new Date(post.created_at), 'MMM dd, yyyy')
+                          }
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </Link>
           ))}
         </div>
 

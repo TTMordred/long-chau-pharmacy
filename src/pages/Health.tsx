@@ -15,6 +15,7 @@ import {
 import DashboardHeader from '@/components/DashboardHeader';
 import { useHealthPosts } from '@/hooks/useCMSContent';
 import { format } from 'date-fns';
+import { Link } from 'react-router-dom';
 
 const Health = () => {
   const { data: healthPosts, isLoading } = useHealthPosts();
@@ -119,66 +120,68 @@ const Health = () => {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredPosts.map((post) => (
-                <Card key={post.id} className="group hover:shadow-lg transition-shadow duration-300 cursor-pointer">
-                  <CardHeader className="p-0">
-                    {post.featured_image_url && (
-                      <div className="aspect-video w-full overflow-hidden rounded-t-lg">
-                        <img 
-                          src={post.featured_image_url} 
-                          alt={post.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                        />
-                      </div>
-                    )}
-                  </CardHeader>
-                  <CardContent className="p-6">
-                    <div className="space-y-3">
-                      {post.category && (
-                        <Badge className={getCategoryColor(post.category)}>
-                          {post.category.charAt(0).toUpperCase() + post.category.slice(1).replace('-', ' ')}
-                        </Badge>
+                <Link key={post.id} to={`/health/${post.slug}`}>
+                  <Card className="group hover:shadow-lg transition-shadow duration-300 cursor-pointer">
+                    <CardHeader className="p-0">
+                      {post.featured_image_url && (
+                        <div className="aspect-video w-full overflow-hidden rounded-t-lg">
+                          <img 
+                            src={post.featured_image_url} 
+                            alt={post.title}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                        </div>
                       )}
-                      
-                      <CardTitle className="text-xl group-hover:text-pink-600 transition-colors">
-                        {post.title}
-                      </CardTitle>
-                      
-                      {post.excerpt && (
-                        <p className="text-gray-600 line-clamp-3">
-                          {post.excerpt}
-                        </p>
-                      )}
-                      
-                      <div className="flex items-center justify-between text-sm text-gray-500">
-                        <div className="flex items-center">
-                          <Calendar className="w-4 h-4 mr-1" />
-                          {post.published_at ? format(new Date(post.published_at), 'MMM dd, yyyy') : 'Recently'}
+                    </CardHeader>
+                    <CardContent className="p-6">
+                      <div className="space-y-3">
+                        {post.category && (
+                          <Badge className={getCategoryColor(post.category)}>
+                            {post.category.charAt(0).toUpperCase() + post.category.slice(1).replace('-', ' ')}
+                          </Badge>
+                        )}
+                        
+                        <CardTitle className="text-xl group-hover:text-pink-600 transition-colors">
+                          {post.title}
+                        </CardTitle>
+                        
+                        {post.excerpt && (
+                          <p className="text-gray-600 line-clamp-3">
+                            {post.excerpt}
+                          </p>
+                        )}
+                        
+                        <div className="flex items-center justify-between text-sm text-gray-500">
+                          <div className="flex items-center">
+                            <Calendar className="w-4 h-4 mr-1" />
+                            {post.published_at ? format(new Date(post.published_at), 'MMM dd, yyyy') : 'Recently'}
+                          </div>
+                          
+                          <div className="flex items-center text-pink-600 hover:text-pink-700 transition-colors">
+                            <span className="text-sm font-medium">Read More</span>
+                            <ArrowRight className="w-4 h-4 ml-1" />
+                          </div>
                         </div>
                         
-                        <Button variant="ghost" size="sm" className="text-pink-600 hover:text-pink-700">
-                          Read More
-                          <ArrowRight className="w-4 h-4 ml-1" />
-                        </Button>
+                        {post.tags && post.tags.length > 0 && (
+                          <div className="flex flex-wrap gap-1 pt-2">
+                            {post.tags.slice(0, 3).map((tag) => (
+                              <Badge key={tag} variant="outline" className="text-xs">
+                                <Tag className="w-3 h-3 mr-1" />
+                                {tag}
+                              </Badge>
+                            ))}
+                            {post.tags.length > 3 && (
+                              <Badge variant="outline" className="text-xs">
+                                +{post.tags.length - 3} more
+                              </Badge>
+                            )}
+                          </div>
+                        )}
                       </div>
-                      
-                      {post.tags && post.tags.length > 0 && (
-                        <div className="flex flex-wrap gap-1 pt-2">
-                          {post.tags.slice(0, 3).map((tag) => (
-                            <Badge key={tag} variant="outline" className="text-xs">
-                              <Tag className="w-3 h-3 mr-1" />
-                              {tag}
-                            </Badge>
-                          ))}
-                          {post.tags.length > 3 && (
-                            <Badge variant="outline" className="text-xs">
-                              +{post.tags.length - 3} more
-                            </Badge>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
+                    </CardContent>
+                  </Card>
+                </Link>
               ))}
             </div>
           )}
