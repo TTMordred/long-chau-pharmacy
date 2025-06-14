@@ -1,3 +1,4 @@
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/components/ui/use-toast';
@@ -337,7 +338,7 @@ export const useDeleteBlogPost = () => {
   });
 };
 
-// Health Posts hooks
+// Health Posts hooks - Now properly typed to return CMSHealthPost[]
 export const useHealthPosts = () => {
   return useQuery({
     queryKey: ['cms-health-posts'],
@@ -348,7 +349,7 @@ export const useHealthPosts = () => {
         .order('created_at', { ascending: false });
       
       if (error) throw error;
-      return data;
+      return data as CMSHealthPost[];
     },
   });
 };
@@ -381,7 +382,7 @@ export const useCreateHealthPost = () => {
         .single();
 
       if (error) throw error;
-      return data;
+      return data as CMSHealthPost;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cms-health-posts'] });
@@ -405,7 +406,7 @@ export const useUpdateHealthPost = () => {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: async ({ id, updates }: { id: string; updates: any }) => {
+    mutationFn: async ({ id, updates }: { id: string; updates: Partial<CMSHealthPost> }) => {
       const updateData = {
         ...updates,
         published_at: updates.status === 'published' && !updates.published_at 
@@ -422,7 +423,7 @@ export const useUpdateHealthPost = () => {
 
       if (error) throw error;
       if (!data) throw new Error('Health post not found or no changes made');
-      return data;
+      return data as CMSHealthPost;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cms-health-posts'] });
