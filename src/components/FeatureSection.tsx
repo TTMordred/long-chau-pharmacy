@@ -1,9 +1,16 @@
 
-import { Upload, Heart, Star, Clock, CheckCircle, Pill, Sparkles, Shield, Zap } from 'lucide-react';
+import { Upload, Heart, Star, Clock, CheckCircle, Pill, Sparkles, Shield, Zap, FileText, Camera } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
 
 const FeatureSection = () => {
+  const navigate = useNavigate();
+
+  const handleUploadPrescription = () => {
+    navigate('/upload-prescription');
+  };
+
   return (
     <div className="py-20 relative overflow-hidden">
       {/* Floating background elements */}
@@ -35,7 +42,7 @@ const FeatureSection = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 max-w-7xl mx-auto">
-          {/* Main Hero Feature Card */}
+          {/* Main Hero Feature Card - Upload Prescription */}
           <Card className="lg:col-span-8 bg-gradient-to-br from-white via-mint/5 to-blue/5 border border-mint/20 overflow-hidden relative group hover:shadow-2xl transition-all duration-700 hover:scale-[1.02] animate-in slide-in-from-left duration-1000 backdrop-blur-sm">
             <div className="absolute inset-0 bg-gradient-to-br from-blue/5 via-mint/10 to-sage/5 opacity-50"></div>
             
@@ -47,25 +54,26 @@ const FeatureSection = () => {
                 <div className="space-y-8">
                   <div className="space-y-4">
                     <div className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue/10 to-mint/10 backdrop-blur-md rounded-2xl border border-blue/20 shadow-lg">
-                      <Pill className="w-5 h-5 mr-3 text-blue" />
-                      <span className="font-semibold text-navy">AI-Powered Care</span>
+                      <FileText className="w-5 h-5 mr-3 text-blue" />
+                      <span className="font-semibold text-navy">Prescription Upload</span>
                     </div>
                     
                     <h3 className="text-4xl md:text-5xl font-bold text-navy leading-tight">
                       Upload & Verify
                       <br />
                       <span className="bg-gradient-to-r from-blue to-mint bg-clip-text text-transparent">
-                        In Seconds
+                        Instantly
                       </span>
                     </h3>
                     
                     <p className="text-lg text-navy/80 leading-relaxed max-w-md">
-                      Our AI-powered system instantly verifies prescriptions with licensed pharmacists for your safety and peace of mind
+                      Simply upload your prescription photo or PDF and get instant verification from our licensed pharmacists. Safe, secure, and hassle-free.
                     </p>
                   </div>
                   
                   <div className="flex flex-col sm:flex-row gap-4">
                     <Button 
+                      onClick={handleUploadPrescription}
                       className="bg-gradient-to-r from-blue to-mint text-white border-0 hover:shadow-xl transition-all duration-300 rounded-2xl px-8 py-4 font-semibold text-lg group relative overflow-hidden"
                     >
                       <div className="absolute inset-0 bg-gradient-to-r from-mint to-blue opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -75,10 +83,34 @@ const FeatureSection = () => {
                     
                     <Button 
                       variant="outline"
-                      className="border-2 border-blue/30 text-navy hover:bg-blue/5 transition-all duration-300 rounded-2xl px-8 py-4 font-semibold"
+                      className="border-2 border-blue/30 text-navy hover:bg-blue/5 transition-all duration-300 rounded-2xl px-8 py-4 font-semibold group"
                     >
-                      Learn More
+                      <Camera className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform duration-300" />
+                      Take Photo
                     </Button>
+                  </div>
+                  
+                  {/* Feature highlights */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-8">
+                    <div className="flex items-center gap-3 p-4 bg-white/60 backdrop-blur-sm rounded-xl border border-mint/20">
+                      <div className="w-10 h-10 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center">
+                        <CheckCircle className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <p className="font-semibold text-navy text-sm">Instant Verification</p>
+                        <p className="text-navy/60 text-xs">Licensed pharmacists</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center gap-3 p-4 bg-white/60 backdrop-blur-sm rounded-xl border border-mint/20">
+                      <div className="w-10 h-10 bg-gradient-to-br from-blue to-navy rounded-full flex items-center justify-center">
+                        <Shield className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <p className="font-semibold text-navy text-sm">100% Secure</p>
+                        <p className="text-navy/60 text-xs">HIPAA compliant</p>
+                      </div>
+                    </div>
                   </div>
                 </div>
                 
@@ -86,12 +118,28 @@ const FeatureSection = () => {
                   <div className="relative">
                     {/* Main upload icon container */}
                     <div className="relative w-48 h-48 bg-gradient-to-br from-white to-mint/20 rounded-3xl flex items-center justify-center shadow-2xl group-hover:scale-110 transition-all duration-700 backdrop-blur-sm border border-mint/30">
-                      <Upload className="w-20 h-20 text-blue group-hover:text-mint transition-colors duration-500" />
+                      <div className="relative">
+                        <Upload className="w-20 h-20 text-blue group-hover:text-mint transition-colors duration-500" />
+                        
+                        {/* Animated pulse ring */}
+                        <div className="absolute inset-0 rounded-full border-2 border-blue/30 animate-ping"></div>
+                        <div className="absolute inset-0 rounded-full border-2 border-mint/20 animate-ping delay-1000"></div>
+                      </div>
                       
-                      {/* Floating elements */}
-                      <div className="absolute -top-4 -right-4 w-8 h-8 bg-gradient-to-br from-sage to-mint rounded-full animate-ping shadow-lg"></div>
-                      <div className="absolute -bottom-4 -left-4 w-6 h-6 bg-gradient-to-br from-blue to-navy rounded-full animate-pulse delay-1000 shadow-lg"></div>
-                      <div className="absolute top-4 -left-6 w-4 h-4 bg-sage rounded-full animate-pulse delay-500 shadow-lg"></div>
+                      {/* Floating prescription icon */}
+                      <div className="absolute -top-6 -right-6 w-12 h-12 bg-gradient-to-br from-white to-blue/10 rounded-xl flex items-center justify-center shadow-lg border border-blue/20 animate-bounce">
+                        <FileText className="w-6 h-6 text-blue" />
+                      </div>
+                      
+                      {/* Floating camera icon */}
+                      <div className="absolute -bottom-6 -left-6 w-12 h-12 bg-gradient-to-br from-white to-mint/10 rounded-xl flex items-center justify-center shadow-lg border border-mint/20 animate-bounce delay-500">
+                        <Camera className="w-6 h-6 text-mint" />
+                      </div>
+                    </div>
+                    
+                    {/* Success checkmark */}
+                    <div className="absolute top-4 right-4 w-8 h-8 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-500 delay-300">
+                      <CheckCircle className="w-5 h-5 text-white" />
                     </div>
                     
                     {/* Orbital elements */}
