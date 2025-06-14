@@ -6,8 +6,7 @@ import type { Tables } from '@/integrations/supabase/types';
 
 export type Prescription = Tables<'prescriptions'>;
 
-// Create a type for new prescriptions that makes reviewed_at optional
-export type NewPrescription = Omit<Prescription, 'id' | 'uploaded_at' | 'reviewed_at'> & {
+export type NewPrescription = Omit<Prescription, 'id' | 'uploaded_at'> & {
   reviewed_at?: string | null;
 };
 
@@ -31,7 +30,6 @@ export const useCreatePrescription = () => {
   
   return useMutation({
     mutationFn: async (prescription: NewPrescription) => {
-      // First ensure user profile exists
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('User not authenticated');
 
@@ -43,7 +41,6 @@ export const useCreatePrescription = () => {
         .single();
 
       if (profileError && profileError.code === 'PGRST116') {
-        // Profile doesn't exist, create it
         const { error: createProfileError } = await supabase
           .from('profiles')
           .insert({
@@ -58,7 +55,6 @@ export const useCreatePrescription = () => {
         }
       }
 
-      // Now create the prescription
       const { data, error } = await supabase
         .from('prescriptions')
         .insert(prescription)
@@ -105,7 +101,45 @@ export const useUpdatePrescription = () => {
       queryClient.invalidateQueries({ queryKey: ['prescriptions'] });
       toast({
         title: "Prescription updated",
-        description: "Prescription status has been updated.",
+        description: "Prescription has been updated successfully.",
+      });
+    },
+    onError: (error) => {
+      console.error('Prescription update error:', error);
+      toast({
+        title: "Update failed",
+        description: error.message || "Failed to update prescription. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+};
+
+export const useDeletePrescription = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from('prescriptions')
+        .delete()
+        .eq('id', id);
+      
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['prescriptions'] });
+      toast({
+        title: "Prescription deleted",
+        description: "Prescription has been deleted successfully.",
+      });
+    },
+    onError: (error) => {
+      console.error('Prescription delete error:', error);
+      toast({
+        title: "Delete failed",
+        description: error.message || "Failed to delete prescription. Please try again.",
+        variant: "destructive",
       });
     },
   });

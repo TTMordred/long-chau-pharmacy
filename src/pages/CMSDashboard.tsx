@@ -1,33 +1,46 @@
 
 import { useState } from 'react';
-import { Plus, Edit, Eye, Trash2, FileText, Users, Settings } from 'lucide-react';
+import { Plus, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useAuth } from '@/hooks/useAuth';
-import { useCMSPages, useBlogPosts } from '@/hooks/useCMS';
-import { usePrescriptions } from '@/hooks/usePrescriptions';
 import { useHasRole } from '@/hooks/useUserRoles';
 import DashboardHeader from '@/components/DashboardHeader';
+import PrescriptionList from '@/components/prescription/PrescriptionList';
+import PrescriptionModal from '@/components/prescription/PrescriptionModal';
+import CMSStats from '@/components/cms/CMSStats';
 import { useNavigate } from 'react-router-dom';
+import type { Prescription } from '@/hooks/usePrescriptions';
 
 const CMSDashboard = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedPrescription, setSelectedPrescription] = useState<Prescription | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   
   const { data: isAdmin } = useHasRole('admin');
   const { data: isContentManager } = useHasRole('content_manager');
   const { data: isPharmacist } = useHasRole('pharmacist');
   
-  const { data: cmsPages } = useCMSPages();
-  const { data: blogPosts } = useBlogPosts();
-  const { data: prescriptions } = usePrescriptions();
-
   const hasAccess = isAdmin || isContentManager || isPharmacist;
+  const canManagePrescriptions = isPharmacist || isAdmin;
+
+  const handleViewDetails = (prescription: Prescription) => {
+    setSelectedPrescription(prescription);
+    setIsModalOpen(true);
+  };
+
+  const handleEdit = (prescription: Prescription) => {
+    setSelectedPrescription(prescription);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setSelectedPrescription(null);
+    setIsModalOpen(false);
+  };
 
   if (!user || !hasAccess) {
     return (
@@ -52,239 +65,113 @@ const CMSDashboard = () => {
     );
   }
 
-  const getStatusBadge = (status: string) => {
-    const variants: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
-      published: "default",
-      draft: "secondary",
-      pending: "outline",
-      approved: "default",
-      rejected: "destructive",
-    };
-    return <Badge variant={variants[status] || "secondary"}>{status}</Badge>;
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-sage/10 via-mint/5 to-blue/10">
-      <DashboardHeader cartItemsCount={0} onCartClick={() => {}} searchQuery={searchQuery} onSearchChange={setSearchQuery} />
+      <DashboardHeader 
+        cartItemsCount={0} 
+        onCartClick={() => {}} 
+        searchQuery={searchQuery} 
+        onSearchChange={setSearchQuery} 
+      />
       
       <div className="pt-24 px-4 pb-12">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h1 className="text-3xl font-bold text-navy">CMS Dashboard</h1>
-              <p className="text-navy/70 mt-2">Manage your content and prescriptions</p>
+              <h1 className="text-3xl font-bold text-navy">Management Dashboard</h1>
+              <p className="text-navy/70 mt-2">
+                {isAdmin && "Full system administration"}
+                {isPharmacist && !isAdmin && "Prescription management"}
+                {isContentManager && !isAdmin && !isPharmacist && "Content management"}
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <Button 
+                onClick={() => navigate('/upload-prescription')}
+                className="bg-gradient-to-r from-green-600 to-green-700"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Add Prescription
+              </Button>
             </div>
           </div>
 
-          <Tabs defaultValue="overview" className="space-y-6">
+          <CMSStats />
+
+          <Tabs defaultValue="prescriptions" className="space-y-6">
             <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="overview" className="flex items-center gap-2">
+              <TabsTrigger value="prescriptions" className="flex items-center gap-2">
                 <Settings className="w-4 h-4" />
-                Overview
+                Prescriptions
               </TabsTrigger>
-              <TabsTrigger value="pages" className="flex items-center gap-2">
-                <FileText className="w-4 h-4" />
-                Pages
+              <TabsTrigger value="analytics" className="flex items-center gap-2">
+                Analytics
               </TabsTrigger>
-              <TabsTrigger value="blog" className="flex items-center gap-2">
-                <Edit className="w-4 h-4" />
-                Blog
+              <TabsTrigger value="users" className="flex items-center gap-2">
+                Users
               </TabsTrigger>
-              {(isPharmacist || isAdmin) && (
-                <TabsTrigger value="prescriptions" className="flex items-center gap-2">
-                  <Users className="w-4 h-4" />
-                  Prescriptions
-                </TabsTrigger>
-              )}
+              <TabsTrigger value="settings" className="flex items-center gap-2">
+                Settings
+              </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="overview">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Total Pages</CardTitle>
-                    <FileText className="h-4 w-4 text-muted-foreground" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">{cmsPages?.length || 0}</div>
-                  </CardContent>
-                </Card>
-                
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Blog Posts</CardTitle>
-                    <Edit className="h-4 w-4 text-muted-foreground" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">{blogPosts?.length || 0}</div>
-                  </CardContent>
-                </Card>
-                
-                {(isPharmacist || isAdmin) && (
-                  <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                      <CardTitle className="text-sm font-medium">Pending Prescriptions</CardTitle>
-                      <Users className="h-4 w-4 text-muted-foreground" />
-                    </CardHeader>
-                    <CardContent>
-                      <div className="text-2xl font-bold">
-                        {prescriptions?.filter(p => p.status === 'pending').length || 0}
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
-              </div>
+            <TabsContent value="prescriptions">
+              <PrescriptionList
+                onViewDetails={handleViewDetails}
+                onEdit={handleEdit}
+                canManage={canManagePrescriptions}
+              />
             </TabsContent>
 
-            <TabsContent value="pages">
+            <TabsContent value="analytics">
               <Card>
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle>CMS Pages</CardTitle>
-                    <Button className="bg-gradient-to-r from-blue to-navy">
-                      <Plus className="w-4 h-4 mr-2" />
-                      New Page
-                    </Button>
+                <CardContent className="pt-6">
+                  <div className="text-center py-12">
+                    <h3 className="text-lg font-semibold mb-2">Analytics Dashboard</h3>
+                    <p className="text-muted-foreground">
+                      Detailed analytics and reporting features coming soon.
+                    </p>
                   </div>
-                </CardHeader>
-                <CardContent>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Title</TableHead>
-                        <TableHead>Slug</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Created</TableHead>
-                        <TableHead>Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {cmsPages?.map((page) => (
-                        <TableRow key={page.id}>
-                          <TableCell className="font-medium">{page.title}</TableCell>
-                          <TableCell>{page.slug}</TableCell>
-                          <TableCell>{getStatusBadge(page.status || 'draft')}</TableCell>
-                          <TableCell>{new Date(page.created_at).toLocaleDateString()}</TableCell>
-                          <TableCell>
-                            <div className="flex items-center gap-2">
-                              <Button variant="outline" size="sm">
-                                <Eye className="w-4 h-4" />
-                              </Button>
-                              <Button variant="outline" size="sm">
-                                <Edit className="w-4 h-4" />
-                              </Button>
-                              <Button variant="outline" size="sm">
-                                <Trash2 className="w-4 h-4" />
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
                 </CardContent>
               </Card>
             </TabsContent>
 
-            <TabsContent value="blog">
+            <TabsContent value="users">
               <Card>
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle>Blog Posts</CardTitle>
-                    <Button className="bg-gradient-to-r from-blue to-navy">
-                      <Plus className="w-4 h-4 mr-2" />
-                      New Post
-                    </Button>
+                <CardContent className="pt-6">
+                  <div className="text-center py-12">
+                    <h3 className="text-lg font-semibold mb-2">User Management</h3>
+                    <p className="text-muted-foreground">
+                      User role management and permissions coming soon.
+                    </p>
                   </div>
-                </CardHeader>
-                <CardContent>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Title</TableHead>
-                        <TableHead>Category</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Published</TableHead>
-                        <TableHead>Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {blogPosts?.map((post) => (
-                        <TableRow key={post.id}>
-                          <TableCell className="font-medium">{post.title}</TableCell>
-                          <TableCell>{post.category}</TableCell>
-                          <TableCell>{getStatusBadge(post.status || 'draft')}</TableCell>
-                          <TableCell>
-                            {post.published_at ? new Date(post.published_at).toLocaleDateString() : '-'}
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex items-center gap-2">
-                              <Button variant="outline" size="sm">
-                                <Eye className="w-4 h-4" />
-                              </Button>
-                              <Button variant="outline" size="sm">
-                                <Edit className="w-4 h-4" />
-                              </Button>
-                              <Button variant="outline" size="sm">
-                                <Trash2 className="w-4 h-4" />
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
                 </CardContent>
               </Card>
             </TabsContent>
 
-            {(isPharmacist || isAdmin) && (
-              <TabsContent value="prescriptions">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Prescription Management</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Customer ID</TableHead>
-                          <TableHead>Status</TableHead>
-                          <TableHead>Uploaded</TableHead>
-                          <TableHead>Reviewed</TableHead>
-                          <TableHead>Actions</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {prescriptions?.map((prescription) => (
-                          <TableRow key={prescription.id}>
-                            <TableCell>{prescription.customer_id.slice(0, 8)}...</TableCell>
-                            <TableCell>{getStatusBadge(prescription.status || 'pending')}</TableCell>
-                            <TableCell>{new Date(prescription.uploaded_at).toLocaleDateString()}</TableCell>
-                            <TableCell>
-                              {prescription.reviewed_at ? new Date(prescription.reviewed_at).toLocaleDateString() : '-'}
-                            </TableCell>
-                            <TableCell>
-                              <div className="flex items-center gap-2">
-                                <Button variant="outline" size="sm">
-                                  <Eye className="w-4 h-4" />
-                                </Button>
-                                <Button variant="outline" size="sm">
-                                  <Edit className="w-4 h-4" />
-                                </Button>
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-            )}
+            <TabsContent value="settings">
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="text-center py-12">
+                    <h3 className="text-lg font-semibold mb-2">System Settings</h3>
+                    <p className="text-muted-foreground">
+                      System configuration and settings coming soon.
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
           </Tabs>
         </div>
       </div>
+
+      {isModalOpen && (
+        <PrescriptionModal
+          prescription={selectedPrescription}
+          onClose={handleCloseModal}
+          canManage={canManagePrescriptions}
+        />
+      )}
     </div>
   );
 };
