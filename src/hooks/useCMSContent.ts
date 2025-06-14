@@ -28,9 +28,19 @@ type CreateProductInput = {
   sku?: string | null;
 };
 
-// Create a proper type for product updates using the database table type
-type UpdateProductInput = Partial<Omit<Product, 'id' | 'created_at' | 'updated_at'>> & {
-  updated_at?: string;
+// Create a proper type for product updates
+type UpdateProductInput = {
+  name?: string;
+  company?: string;
+  price?: number;
+  description?: string | null;
+  original_price?: number | null;
+  category_id?: string | null;
+  stock_quantity?: number;
+  status?: string;
+  prescription_required?: boolean;
+  image_url?: string | null;
+  sku?: string | null;
 };
 
 // Pages
@@ -333,13 +343,19 @@ export const useCreateProduct = () => {
   
   return useMutation({
     mutationFn: async (product: CreateProductInput) => {
+      console.log('Creating product with data:', product);
+      
       const { data, error } = await supabase
         .from('products')
         .insert(product)
         .select()
         .single();
       
-      if (error) throw error;
+      if (error) {
+        console.error('Product creation error:', error);
+        throw error;
+      }
+      console.log('Product created successfully:', data);
       return data;
     },
     onSuccess: () => {
@@ -352,6 +368,7 @@ export const useCreateProduct = () => {
       });
     },
     onError: (error) => {
+      console.error('Create product mutation error:', error);
       toast({
         title: "Failed to create product",
         description: error.message,
@@ -366,15 +383,28 @@ export const useUpdateProduct = () => {
   
   return useMutation({
     mutationFn: async ({ id, updates }: { id: string; updates: UpdateProductInput }) => {
-      // Only include fields that are actually being updated
-      const cleanUpdates = Object.fromEntries(
-        Object.entries(updates).filter(([_, value]) => value !== undefined)
-      );
-
-      const updateData = {
-        ...cleanUpdates,
-        updated_at: new Date().toISOString(),
-      };
+      console.log('Updating product with ID:', id, 'and data:', updates);
+      
+      // Build update object with only provided fields
+      const updateData: any = {};
+      
+      // Only include fields that are explicitly provided
+      if (updates.name !== undefined) updateData.name = updates.name;
+      if (updates.company !== undefined) updateData.company = updates.company;
+      if (updates.price !== undefined) updateData.price = updates.price;
+      if (updates.description !== undefined) updateData.description = updates.description;
+      if (updates.original_price !== undefined) updateData.original_price = updates.original_price;
+      if (updates.category_id !== undefined) updateData.category_id = updates.category_id;
+      if (updates.stock_quantity !== undefined) updateData.stock_quantity = updates.stock_quantity;
+      if (updates.status !== undefined) updateData.status = updates.status;
+      if (updates.prescription_required !== undefined) updateData.prescription_required = updates.prescription_required;
+      if (updates.image_url !== undefined) updateData.image_url = updates.image_url;
+      if (updates.sku !== undefined) updateData.sku = updates.sku;
+      
+      // Always update the updated_at timestamp
+      updateData.updated_at = new Date().toISOString();
+      
+      console.log('Final update data:', updateData);
 
       const { data, error } = await supabase
         .from('products')
@@ -383,7 +413,11 @@ export const useUpdateProduct = () => {
         .select()
         .single();
       
-      if (error) throw error;
+      if (error) {
+        console.error('Product update error:', error);
+        throw error;
+      }
+      console.log('Product updated successfully:', data);
       return data;
     },
     onSuccess: (data, variables) => {
@@ -401,6 +435,7 @@ export const useUpdateProduct = () => {
       });
     },
     onError: (error) => {
+      console.error('Update product mutation error:', error);
       toast({
         title: "Failed to update product",
         description: error.message,
@@ -415,12 +450,18 @@ export const useDeleteProduct = () => {
   
   return useMutation({
     mutationFn: async (id: string) => {
+      console.log('Deleting product with ID:', id);
+      
       const { error } = await supabase
         .from('products')
         .delete()
         .eq('id', id);
       
-      if (error) throw error;
+      if (error) {
+        console.error('Product deletion error:', error);
+        throw error;
+      }
+      console.log('Product deleted successfully');
       return id;
     },
     onSuccess: (deletedId) => {
@@ -448,6 +489,7 @@ export const useDeleteProduct = () => {
       });
     },
     onError: (error) => {
+      console.error('Delete product mutation error:', error);
       toast({
         title: "Failed to delete product",
         description: error.message,
