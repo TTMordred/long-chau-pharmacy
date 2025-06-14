@@ -28,19 +28,8 @@ type CreateProductInput = {
   sku?: string | null;
 };
 
-// Create a proper type for product updates that allows partial updates
-type UpdateProductInput = {
-  name?: string;
-  company?: string;
-  price?: number;
-  description?: string | null;
-  original_price?: number | null;
-  category_id?: string | null;
-  stock_quantity?: number;
-  status?: string;
-  prescription_required?: boolean;
-  image_url?: string | null;
-  sku?: string | null;
+// Create a proper type for product updates using the database table type
+type UpdateProductInput = Partial<Omit<Product, 'id' | 'created_at' | 'updated_at'>> & {
   updated_at?: string;
 };
 
@@ -375,8 +364,13 @@ export const useUpdateProduct = () => {
   
   return useMutation({
     mutationFn: async ({ id, updates }: { id: string; updates: UpdateProductInput }) => {
+      // Only include fields that are actually being updated
+      const cleanUpdates = Object.fromEntries(
+        Object.entries(updates).filter(([_, value]) => value !== undefined)
+      );
+
       const updateData = {
-        ...updates,
+        ...cleanUpdates,
         updated_at: new Date().toISOString(),
       };
 
