@@ -6,6 +6,11 @@ import type { Tables } from '@/integrations/supabase/types';
 
 export type Prescription = Tables<'prescriptions'>;
 
+// Create a type for new prescriptions that makes reviewed_at optional
+export type NewPrescription = Omit<Prescription, 'id' | 'uploaded_at' | 'reviewed_at'> & {
+  reviewed_at?: string | null;
+};
+
 export const usePrescriptions = () => {
   return useQuery({
     queryKey: ['prescriptions'],
@@ -25,7 +30,7 @@ export const useCreatePrescription = () => {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: async (prescription: Omit<Prescription, 'id' | 'uploaded_at'>) => {
+    mutationFn: async (prescription: NewPrescription) => {
       const { data, error } = await supabase
         .from('prescriptions')
         .insert(prescription)
