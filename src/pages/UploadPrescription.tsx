@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Upload, FileText, Camera, CheckCircle, AlertCircle } from 'lucide-react';
@@ -78,12 +77,37 @@ const UploadPrescription = () => {
     setUploadProgress(10);
 
     try {
-      // Upload file to storage
+      // --- Ensuring the customer exists ---
+      // Check for customer in customers table
+      const { data: existingCustomer, error: customerFetchError } = await supabase
+        .from('customers')
+        .select('id')
+        .eq('id', user.id)
+        .maybeSingle();
+
+      if (customerFetchError) {
+        throw new Error('Error checking customer: ' + customerFetchError.message);
+      }
+      if (!existingCustomer) {
+        // If not found, insert customer
+        const { error: customerInsertError } = await supabase
+          .from('customers')
+          .insert({
+            id: user.id,
+            email: user.email,
+            full_name: user.user_metadata?.full_name || 'Unknown User',
+          });
+        if (customerInsertError) {
+          throw new Error('Failed to create customer: ' + customerInsertError.message);
+        }
+      }
+
+      // --- Upload file to storage ---
       const fileExt = prescriptionFile.name.split('.').pop();
       const fileName = `${user.id}/${Date.now()}.${fileExt}`;
-      
+
       setUploadProgress(30);
-      
+
       const { error: uploadError } = await supabase.storage
         .from('prescriptions')
         .upload(fileName, prescriptionFile);
@@ -102,7 +126,7 @@ const UploadPrescription = () => {
 
       setUploadProgress(80);
 
-      // Create prescription record
+      // --- Create prescription record ---
       await createPrescription.mutateAsync({
         customer_id: user.id,
         prescription_image_url: publicUrl,
@@ -116,8 +140,7 @@ const UploadPrescription = () => {
       // Reset form
       setFormData({ pharmacistNotes: '' });
       setPrescriptionFile(null);
-      
-      // Navigate back to home after successful upload
+
       setTimeout(() => {
         navigate('/');
       }, 2000);
