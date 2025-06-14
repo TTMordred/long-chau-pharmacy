@@ -1,8 +1,8 @@
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/components/ui/use-toast';
 import { CMSPage, CMSBlogPost } from '@/hooks/useCMS';
+import type { Product } from '@/hooks/useProducts';
 
 // Create types that exclude fields handled by the backend
 type CreatePageInput = Omit<CMSPage, 'id' | 'created_at' | 'updated_at' | 'author_id' | 'published_at'> & {
@@ -300,6 +300,105 @@ export const useDeleteBlogPost = () => {
     onError: (error) => {
       toast({
         title: "Failed to delete blog post",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+};
+
+// Products Management
+export const useCreateProduct = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async (product: Partial<Product>) => {
+      const { data, error } = await supabase
+        .from('products')
+        .insert(product)
+        .select()
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+      toast({
+        title: "Product created",
+        description: "The product has been created successfully.",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Failed to create product",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+};
+
+export const useUpdateProduct = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async ({ id, updates }: { id: string; updates: Partial<Product> }) => {
+      const updateData = {
+        ...updates,
+        updated_at: new Date().toISOString(),
+      };
+
+      const { data, error } = await supabase
+        .from('products')
+        .update(updateData)
+        .eq('id', id)
+        .select()
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+      queryClient.invalidateQueries({ queryKey: ['product', variables.id] });
+      toast({
+        title: "Product updated",
+        description: "The product has been updated successfully.",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Failed to update product",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+};
+
+export const useDeleteProduct = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from('products')
+        .delete()
+        .eq('id', id);
+      
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+      toast({
+        title: "Product deleted",
+        description: "The product has been deleted successfully.",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Failed to delete product",
         description: error.message,
         variant: "destructive",
       });

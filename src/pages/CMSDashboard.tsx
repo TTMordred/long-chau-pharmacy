@@ -1,7 +1,6 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Settings, FileText, BookOpen, Users, LayoutGrid } from 'lucide-react';
+import { Plus, Settings, FileText, BookOpen, Users, LayoutGrid, Package } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -13,6 +12,7 @@ import PrescriptionModal from '@/components/prescription/PrescriptionModal';
 import PrescriptionStats from '@/components/cms/PrescriptionStats';
 import PagesManagement from '@/components/cms/PagesManagement';
 import BlogPostsManagement from '@/components/cms/BlogPostsManagement';
+import ProductsManagement from '@/components/cms/ProductsManagement';
 import type { Prescription } from '@/hooks/usePrescriptions';
 
 const CMSDashboard = () => {
@@ -30,6 +30,7 @@ const CMSDashboard = () => {
   const hasAccess = isAdmin || isContentManager || isPharmacist;
   const canManagePrescriptions = isPharmacist || isAdmin;
   const canManageContent = isContentManager || isAdmin;
+  const canManageProducts = isPharmacist || isAdmin;
 
   const handleViewDetails = (prescription: Prescription) => {
     setSelectedPrescription(prescription);
@@ -127,7 +128,7 @@ const CMSDashboard = () => {
             onValueChange={setActiveTab} 
             className="space-y-6"
           >
-            <TabsList className="grid w-full grid-cols-1 sm:grid-cols-4 h-auto gap-2 sm:gap-0 bg-transparent">
+            <TabsList className="grid w-full grid-cols-1 sm:grid-cols-5 h-auto gap-2 sm:gap-0 bg-transparent">
               {canManagePrescriptions && (
                 <TabsTrigger 
                   value="prescriptions" 
@@ -135,6 +136,15 @@ const CMSDashboard = () => {
                 >
                   <FileText className="w-4 h-4" />
                   Prescriptions
+                </TabsTrigger>
+              )}
+              {canManageProducts && (
+                <TabsTrigger 
+                  value="products" 
+                  className="flex items-center gap-2 h-12 data-[state=active]:bg-navy data-[state=active]:text-white"
+                >
+                  <Package className="w-4 h-4" />
+                  Products
                 </TabsTrigger>
               )}
               {canManageContent && (
@@ -173,6 +183,12 @@ const CMSDashboard = () => {
                   onEdit={handleEdit}
                   canManage={canManagePrescriptions}
                 />
+              </TabsContent>
+            )}
+
+            {canManageProducts && (
+              <TabsContent value="products">
+                <ProductsManagement />
               </TabsContent>
             )}
 
