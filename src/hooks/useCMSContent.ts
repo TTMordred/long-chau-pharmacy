@@ -343,7 +343,9 @@ export const useCreateProduct = () => {
       return data;
     },
     onSuccess: () => {
+      // Invalidate all product-related queries
       queryClient.invalidateQueries({ queryKey: ['products'] });
+      queryClient.invalidateQueries({ queryKey: ['cms-products'] });
       toast({
         title: "Product created",
         description: "The product has been created successfully.",
@@ -384,9 +386,15 @@ export const useUpdateProduct = () => {
       if (error) throw error;
       return data;
     },
-    onSuccess: (_, variables) => {
+    onSuccess: (data, variables) => {
+      // Invalidate all product-related queries
       queryClient.invalidateQueries({ queryKey: ['products'] });
+      queryClient.invalidateQueries({ queryKey: ['cms-products'] });
       queryClient.invalidateQueries({ queryKey: ['product', variables.id] });
+      
+      // Update the specific product in the cache
+      queryClient.setQueryData(['product', variables.id], data);
+      
       toast({
         title: "Product updated",
         description: "The product has been updated successfully.",
@@ -413,9 +421,27 @@ export const useDeleteProduct = () => {
         .eq('id', id);
       
       if (error) throw error;
+      return id;
     },
-    onSuccess: () => {
+    onSuccess: (deletedId) => {
+      // Invalidate all product-related queries
       queryClient.invalidateQueries({ queryKey: ['products'] });
+      queryClient.invalidateQueries({ queryKey: ['cms-products'] });
+      
+      // Remove the specific product from all relevant caches
+      queryClient.removeQueries({ queryKey: ['product', deletedId] });
+      
+      // Update the products list cache by removing the deleted product
+      queryClient.setQueriesData(
+        { queryKey: ['products'] },
+        (oldData: any) => {
+          if (Array.isArray(oldData)) {
+            return oldData.filter((product: any) => product.id !== deletedId);
+          }
+          return oldData;
+        }
+      );
+      
       toast({
         title: "Product deleted",
         description: "The product has been deleted successfully.",

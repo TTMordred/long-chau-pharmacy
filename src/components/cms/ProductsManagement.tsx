@@ -60,7 +60,7 @@ const ProductsManagement = () => {
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
   
-  const { data: products, isLoading, error } = useProducts(searchQuery, categoryFilter);
+  const { data: products, isLoading, error, refetch } = useProducts(searchQuery, categoryFilter);
   const { data: categories } = useCategories();
   const createProduct = useCreateProduct();
   const updateProduct = useUpdateProduct();
@@ -74,6 +74,8 @@ const ProductsManagement = () => {
     try {
       await createProduct.mutateAsync(productData);
       setIsCreating(false);
+      // Force refetch to ensure UI is updated
+      await refetch();
     } catch (error) {
       console.error('Failed to create product:', error);
     }
@@ -88,6 +90,8 @@ const ProductsManagement = () => {
         updates: productData,
       });
       setEditingProduct(null);
+      // Force refetch to ensure UI is updated
+      await refetch();
     } catch (error) {
       console.error('Failed to update product:', error);
     }
@@ -97,6 +101,8 @@ const ProductsManagement = () => {
     try {
       await deleteProduct.mutateAsync(id);
       setIsConfirmingDelete(null);
+      // Force refetch to ensure UI is updated
+      await refetch();
     } catch (error) {
       console.error('Failed to delete product:', error);
     }
@@ -141,6 +147,9 @@ const ProductsManagement = () => {
         </CardHeader>
         <CardContent>
           <p className="text-red-500">Failed to load products: {error.message}</p>
+          <Button onClick={() => refetch()} className="mt-4">
+            Retry
+          </Button>
         </CardContent>
       </Card>
     );
@@ -344,8 +353,9 @@ const ProductsManagement = () => {
                               <Button
                                 variant="destructive"
                                 onClick={() => handleDeleteProduct(product.id)}
+                                disabled={deleteProduct.isPending}
                               >
-                                Delete
+                                {deleteProduct.isPending ? 'Deleting...' : 'Delete'}
                               </Button>
                             </div>
                           </DialogContent>
