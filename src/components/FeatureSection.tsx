@@ -71,22 +71,14 @@ const FeatureSection = () => {
                     </p>
                   </div>
                   
-                  <div className="flex flex-col sm:flex-row gap-4">
+                  <div className="flex flex-col gap-4">
                     <Button 
                       onClick={handleUploadPrescription}
-                      className="bg-gradient-to-r from-blue to-mint text-white border-0 hover:shadow-xl transition-all duration-300 rounded-2xl px-8 py-4 font-semibold text-lg group relative overflow-hidden"
+                      className="bg-gradient-to-r from-blue to-mint text-white border-0 hover:shadow-xl transition-all duration-300 rounded-2xl px-8 py-4 font-semibold text-lg group relative overflow-hidden w-full sm:w-auto"
                     >
                       <div className="absolute inset-0 bg-gradient-to-r from-mint to-blue opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                       <Upload className="w-5 h-5 mr-2 relative z-10" />
                       <span className="relative z-10">Upload Prescription</span>
-                    </Button>
-                    
-                    <Button 
-                      variant="outline"
-                      className="border-2 border-blue/30 text-navy hover:bg-blue/5 transition-all duration-300 rounded-2xl px-8 py-4 font-semibold group"
-                    >
-                      <Camera className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform duration-300" />
-                      Take Photo
                     </Button>
                   </div>
                   
