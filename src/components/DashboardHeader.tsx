@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { Search, ShoppingCart, User, LogOut, Menu } from 'lucide-react';
+import { Search, ShoppingCart, User, LogOut, Menu, Upload, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -12,6 +12,8 @@ import {
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import { useAuth } from '@/hooks/useAuth';
+import { useHasRole } from '@/hooks/useUserRoles';
+import { useNavigate } from 'react-router-dom';
 import AuthModal from '@/components/AuthModal';
 
 interface DashboardHeaderProps {
@@ -23,14 +25,21 @@ interface DashboardHeaderProps {
 
 const DashboardHeader = ({ cartItemsCount, onCartClick, searchQuery, onSearchChange }: DashboardHeaderProps) => {
   const { user, signOut } = useAuth();
+  const navigate = useNavigate();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  
+  const { data: isAdmin } = useHasRole('admin');
+  const { data: isContentManager } = useHasRole('content_manager');
+  const { data: isPharmacist } = useHasRole('pharmacist');
+  
+  const hasAdminAccess = isAdmin || isContentManager || isPharmacist;
 
   return (
     <>
       <header className="fixed top-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-sm border-b border-mint/40 shadow-sm">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           {/* Logo */}
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-3 cursor-pointer" onClick={() => navigate('/')}>
             <div className="w-10 h-10 bg-gradient-to-br from-blue to-mint rounded-2xl flex items-center justify-center shadow-lg">
               <span className="text-white font-bold text-lg">LC</span>
             </div>
@@ -54,6 +63,18 @@ const DashboardHeader = ({ cartItemsCount, onCartClick, searchQuery, onSearchCha
 
           {/* Actions */}
           <div className="flex items-center space-x-3">
+            {/* Upload Prescription Button */}
+            {user && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="bg-mint/20 hover:bg-mint/30 rounded-2xl p-3"
+                onClick={() => navigate('/upload-prescription')}
+              >
+                <Upload className="w-5 h-5 text-navy" />
+              </Button>
+            )}
+
             {/* Cart Button */}
             <Button
               variant="ghost"
@@ -82,6 +103,17 @@ const DashboardHeader = ({ cartItemsCount, onCartClick, searchQuery, onSearchCha
                     <p className="text-sm font-medium text-navy">{user.email}</p>
                     <p className="text-xs text-navy/60">Welcome back!</p>
                   </div>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => navigate('/upload-prescription')}>
+                    <Upload className="w-4 h-4 mr-2" />
+                    Upload Prescription
+                  </DropdownMenuItem>
+                  {hasAdminAccess && (
+                    <DropdownMenuItem onClick={() => navigate('/cms-dashboard')}>
+                      <Settings className="w-4 h-4 mr-2" />
+                      CMS Dashboard
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={signOut} className="text-red-600">
                     <LogOut className="w-4 h-4 mr-2" />
