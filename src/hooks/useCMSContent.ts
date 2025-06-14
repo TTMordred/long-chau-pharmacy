@@ -681,7 +681,7 @@ export const useUploadCMSMedia = () => {
         `${Date.now()}_${file.name}`;
       
       const { data, error } = await supabase.storage
-        .from('cms-content')
+        .from('cms-media')
         .upload(filePath, file, {
           cacheControl: '3600',
           upsert: false
@@ -690,7 +690,7 @@ export const useUploadCMSMedia = () => {
       if (error) throw error;
       
       const { data: { publicUrl } } = supabase.storage
-        .from('cms-content')
+        .from('cms-media')
         .getPublicUrl(data.path);
       
       return publicUrl;
@@ -710,7 +710,7 @@ export const useDeleteCMSMedia = () => {
   return useMutation({
     mutationFn: async (path: string) => {
       const { error } = await supabase.storage
-        .from('cms-content')
+        .from('cms-media')
         .remove([path]);
       
       if (error) throw error;
