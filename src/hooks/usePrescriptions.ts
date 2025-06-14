@@ -1,4 +1,3 @@
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/components/ui/use-toast';
@@ -127,6 +126,7 @@ export const useCreatePrescription = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['prescriptions'] });
+      queryClient.invalidateQueries({ queryKey: ['prescription-stats'] });
       toast({
         title: "Prescription uploaded successfully",
         description: "Your prescription has been submitted for review.",
@@ -171,7 +171,9 @@ export const useUpdatePrescription = () => {
       
       // If we know the customer_id, invalidate customer-specific queries
       if (data.customer_id) {
-        queryClient.invalidateQueries({ queryKey: ['prescriptions', 'customer', data.customer_id] });
+        queryClient.invalidateQueries({ 
+          queryKey: ['prescriptions', 'customer', data.customer_id] 
+        });
       }
       
       toast({
@@ -266,6 +268,39 @@ export const useDeletePrescription = () => {
   });
 };
 
+// Upload Prescription File
+export const useUploadPrescriptionFile = () => {
+  return useMutation({
+    mutationFn: async ({ file, userId }: { file: File, userId: string }) => {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${userId}/${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
+      
+      const { data, error } = await supabase.storage
+        .from('prescriptions')
+        .upload(fileName, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
+      
+      if (error) throw error;
+      
+      const { data: { publicUrl } } = supabase.storage
+        .from('prescriptions')
+        .getPublicUrl(data.path);
+      
+      return publicUrl;
+    },
+    onError: (error) => {
+      console.error('File upload error:', error);
+      toast({
+        title: "Upload failed",
+        description: error.message || "Failed to upload file. Please try again.",
+        variant: "destructive",
+      });
+    }
+  });
+};
+
 // Set up real-time subscription for prescriptions
 export const setupPrescriptionSubscription = (queryClient: any) => {
   const channel = supabase
@@ -274,24 +309,43 @@ export const setupPrescriptionSubscription = (queryClient: any) => {
       'postgres_changes',
       { event: '*', schema: 'public', table: 'prescriptions' },
       (payload) => {
+        console.log('Prescription change:', payload);
+        
         // Invalidate and refetch prescriptions queries when data changes
         queryClient.invalidateQueries({ queryKey: ['prescriptions'] });
         queryClient.invalidateQueries({ queryKey: ['prescription-stats'] });
         
+        // Type-safe payload handling
+        const newRecord = payload.new as Prescription | null;
+        const oldRecord = payload.old as Prescription | null;
+        
         // For specific record changes, invalidate the specific queries
-        if (payload.new && payload.new.id) {
-          queryClient.invalidateQueries({ queryKey: ['prescription', payload.new.id] });
+        if (newRecord?.id) {
+          queryClient.invalidateQueries({ queryKey: ['prescription', newRecord.id] });
         }
         
-        if (payload.new && payload.new.customer_id) {
+        if (newRecord?.customer_id) {
           queryClient.invalidateQueries({ 
-            queryKey: ['prescriptions', 'customer', payload.new.customer_id] 
+            queryKey: ['prescriptions', 'customer', newRecord.customer_id] 
           });
         }
         
-        if (payload.new && payload.new.status) {
+        if (newRecord?.status) {
           queryClient.invalidateQueries({ 
-            queryKey: ['prescriptions', 'status', payload.new.status] 
+            queryKey: ['prescriptions', 'status', newRecord.status] 
+          });
+        }
+        
+        // Handle old record for updates/deletes
+        if (oldRecord?.customer_id && oldRecord.customer_id !== newRecord?.customer_id) {
+          queryClient.invalidateQueries({ 
+            queryKey: ['prescriptions', 'customer', oldRecord.customer_id] 
+          });
+        }
+        
+        if (oldRecord?.status && oldRecord.status !== newRecord?.status) {
+          queryClient.invalidateQueries({ 
+            queryKey: ['prescriptions', 'status', oldRecord.status] 
           });
         }
       }

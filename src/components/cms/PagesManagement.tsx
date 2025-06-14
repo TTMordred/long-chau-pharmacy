@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Plus, Pencil, Trash2, Eye, File, ArrowUpDown } from 'lucide-react';
 import {
@@ -35,7 +34,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { useCMSPages, useCreateCMSPage, useUpdateCMSPage, useDeleteCMSPage } from '@/hooks/useCMS';
 import { usePages, useCreatePage, useUpdatePage, useDeletePage } from '@/hooks/useCMSContent';
 import { toast } from '@/components/ui/use-toast';
 import { format } from 'date-fns';
