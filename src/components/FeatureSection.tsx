@@ -82,25 +82,38 @@ const FeatureSection = () => {
                     </Button>
                   </div>
                   
-                  {/* Feature highlights */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-8">
-                    <div className="flex items-center gap-3 p-4 bg-white/60 backdrop-blur-sm rounded-xl border border-mint/20">
-                      <div className="w-10 h-10 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center">
-                        <CheckCircle className="w-5 h-5 text-white" />
+                  {/* Enhanced Feature highlights */}
+                  <div className="mt-12 space-y-6">
+                    <h4 className="text-xl font-bold text-navy mb-6">Why Upload with Us?</h4>
+                    <div className="grid grid-cols-1 gap-6">
+                      <div className="flex items-start gap-4 p-6 bg-gradient-to-r from-white/80 to-mint/10 backdrop-blur-sm rounded-2xl border border-mint/20 shadow-lg hover:shadow-xl transition-all duration-300 group">
+                        <div className="flex-shrink-0 w-14 h-14 bg-gradient-to-br from-green-400 to-green-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+                          <CheckCircle className="w-7 h-7 text-white" />
+                        </div>
+                        <div className="flex-1">
+                          <h5 className="font-bold text-navy text-lg mb-2">Instant Verification</h5>
+                          <p className="text-navy/70 text-sm leading-relaxed">Get your prescription verified by licensed pharmacists within minutes. No waiting, no hassle.</p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="font-semibold text-navy text-sm">Instant Verification</p>
-                        <p className="text-navy/60 text-xs">Licensed pharmacists</p>
+                      
+                      <div className="flex items-start gap-4 p-6 bg-gradient-to-r from-white/80 to-blue/10 backdrop-blur-sm rounded-2xl border border-blue/20 shadow-lg hover:shadow-xl transition-all duration-300 group">
+                        <div className="flex-shrink-0 w-14 h-14 bg-gradient-to-br from-blue to-navy rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+                          <Shield className="w-7 h-7 text-white" />
+                        </div>
+                        <div className="flex-1">
+                          <h5 className="font-bold text-navy text-lg mb-2">100% Secure & Private</h5>
+                          <p className="text-navy/70 text-sm leading-relaxed">HIPAA compliant encryption ensures your medical information stays completely private and secure.</p>
+                        </div>
                       </div>
-                    </div>
-                    
-                    <div className="flex items-center gap-3 p-4 bg-white/60 backdrop-blur-sm rounded-xl border border-mint/20">
-                      <div className="w-10 h-10 bg-gradient-to-br from-blue to-navy rounded-full flex items-center justify-center">
-                        <Shield className="w-5 h-5 text-white" />
-                      </div>
-                      <div>
-                        <p className="font-semibold text-navy text-sm">100% Secure</p>
-                        <p className="text-navy/60 text-xs">HIPAA compliant</p>
+                      
+                      <div className="flex items-start gap-4 p-6 bg-gradient-to-r from-white/80 to-sage/10 backdrop-blur-sm rounded-2xl border border-sage/20 shadow-lg hover:shadow-xl transition-all duration-300 group">
+                        <div className="flex-shrink-0 w-14 h-14 bg-gradient-to-br from-mint to-sage rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+                          <Zap className="w-7 h-7 text-white" />
+                        </div>
+                        <div className="flex-1">
+                          <h5 className="font-bold text-navy text-lg mb-2">Smart Processing</h5>
+                          <p className="text-navy/70 text-sm leading-relaxed">AI-powered text recognition automatically extracts medication details for faster processing.</p>
+                        </div>
                       </div>
                     </div>
                   </div>
