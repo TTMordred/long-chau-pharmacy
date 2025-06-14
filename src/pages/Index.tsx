@@ -1,3 +1,4 @@
+
 import React from 'react';
 import ProductGrid from '@/components/ProductGrid';
 import ProductModal from '@/components/ProductModal';
@@ -6,6 +7,8 @@ import DashboardHeader from '@/components/DashboardHeader';
 import FeatureSection from '@/components/FeatureSection';
 import HeroSection from '@/components/HeroSection';
 import StatsSection from '@/components/StatsSection';
+import HealthPostsSection from '@/components/HealthPostsSection';
+import BlogPostsSection from '@/components/BlogPostsSection';
 import EnhancedCartSidebar from '@/components/EnhancedCartSidebar';
 import { AuthProvider } from '@/hooks/useAuth';
 import { useCart } from '@/hooks/useCart';
@@ -47,6 +50,16 @@ const IndexContent = () => {
           <HeroSection />
           <StatsSection />
           <FeatureSection />
+          
+          {/* Health Posts Section */}
+          <div className="mt-16">
+            <HealthPostsSection />
+          </div>
+          
+          {/* Blog Posts Section */}
+          <div className="mt-8">
+            <BlogPostsSection />
+          </div>
           
           <div className="mt-16">
             <CategoryNav 
