@@ -2,31 +2,32 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { BookOpen, ArrowRight, Calendar, User, Tag } from 'lucide-react';
+import { useBlogPosts } from '@/hooks/useCMSContent';
+import { format } from 'date-fns';
+import { Link } from 'react-router-dom';
 
 const BlogPostsSection = () => {
-  // Mock blog posts data - in a real app this would come from your CMS
-  const blogPosts = [
-    {
-      id: 1,
-      title: "The Future of Digital Healthcare",
-      excerpt: "Exploring how technology is revolutionizing healthcare delivery and patient experience in the modern world.",
-      image: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&h=300&fit=crop",
-      author: "Tech Team",
-      date: "2024-06-12",
-      category: "Technology",
-      tags: ["Digital Health", "Innovation"]
-    },
-    {
-      id: 2,
-      title: "Building Trust in Online Pharmacy Services",
-      excerpt: "How we ensure safety, quality, and reliability in every aspect of our online pharmacy platform.",
-      image: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=400&h=300&fit=crop",
-      author: "Quality Assurance",
-      date: "2024-06-09",
-      category: "Safety",
-      tags: ["Trust", "Quality"]
-    }
-  ];
+  const { data: blogPosts, isLoading } = useBlogPosts();
+
+  // Get only published posts and limit to 2 for homepage
+  const publishedPosts = blogPosts?.filter(post => post.status === 'published').slice(0, 2) || [];
+
+  if (isLoading) {
+    return (
+      <div className="py-16 bg-gradient-to-br from-blue/5 via-mint/10 to-sage/5 relative overflow-hidden">
+        <div className="text-center">
+          <div className="animate-pulse space-y-4">
+            <div className="h-8 bg-gray-200 rounded w-64 mx-auto"></div>
+            <div className="h-4 bg-gray-200 rounded w-96 mx-auto"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!publishedPosts.length) {
+    return null; // Don't show section if no posts
+  }
 
   return (
     <div className="py-16 bg-gradient-to-br from-blue/5 via-mint/10 to-sage/5 relative overflow-hidden">
@@ -56,26 +57,34 @@ const BlogPostsSection = () => {
 
         {/* Blog Posts Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-5xl mx-auto mb-8">
-          {blogPosts.map((post, index) => (
+          {publishedPosts.map((post, index) => (
             <Card 
               key={post.id}
-              className="bg-white/90 backdrop-blur-sm border border-blue/20 hover:border-navy/40 transition-all duration-300 hover:scale-105 group shadow-lg hover:shadow-2xl"
+              className="bg-white/90 backdrop-blur-sm border border-blue/20 hover:border-navy/40 transition-all duration-300 hover:scale-105 group shadow-lg hover:shadow-2xl cursor-pointer"
               style={{ animationDelay: `${index * 200}ms` }}
             >
               <CardContent className="p-0">
                 <div className="lg:flex lg:h-64">
                   {/* Image Section */}
                   <div className="lg:w-2/5 relative overflow-hidden">
-                    <img 
-                      src={post.image} 
-                      alt={post.title}
-                      className="w-full h-48 lg:h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                    />
-                    <div className="absolute top-3 left-3">
-                      <span className="px-3 py-1 bg-blue/90 text-white text-xs font-semibold rounded-full">
-                        {post.category}
-                      </span>
-                    </div>
+                    {post.featured_image_url ? (
+                      <img 
+                        src={post.featured_image_url} 
+                        alt={post.title}
+                        className="w-full h-48 lg:h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      />
+                    ) : (
+                      <div className="w-full h-48 lg:h-full bg-gradient-to-br from-blue/20 to-navy/30 flex items-center justify-center">
+                        <BookOpen className="w-12 h-12 text-blue/60" />
+                      </div>
+                    )}
+                    {post.category && (
+                      <div className="absolute top-3 left-3">
+                        <span className="px-3 py-1 bg-blue/90 text-white text-xs font-semibold rounded-full">
+                          {post.category.charAt(0).toUpperCase() + post.category.slice(1)}
+                        </span>
+                      </div>
+                    )}
                   </div>
                   
                   {/* Content Section */}
@@ -85,31 +94,46 @@ const BlogPostsSection = () => {
                         {post.title}
                       </h3>
                       
-                      <p className="text-navy/70 leading-relaxed">
-                        {post.excerpt}
-                      </p>
+                      {post.excerpt && (
+                        <p className="text-navy/70 leading-relaxed">
+                          {post.excerpt}
+                        </p>
+                      )}
                       
-                      <div className="flex flex-wrap gap-2">
-                        {post.tags.map((tag, tagIndex) => (
-                          <span 
-                            key={tagIndex}
-                            className="inline-flex items-center gap-1 px-2 py-1 bg-mint/20 text-navy text-xs rounded-full"
-                          >
-                            <Tag className="w-2 h-2" />
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
+                      {post.tags && post.tags.length > 0 && (
+                        <div className="flex flex-wrap gap-2">
+                          {post.tags.slice(0, 3).map((tag, tagIndex) => (
+                            <span 
+                              key={tagIndex}
+                              className="inline-flex items-center gap-1 px-2 py-1 bg-mint/20 text-navy text-xs rounded-full"
+                            >
+                              <Tag className="w-2 h-2" />
+                              {tag}
+                            </span>
+                          ))}
+                          {post.tags.length > 3 && (
+                            <span className="inline-flex items-center gap-1 px-2 py-1 bg-mint/20 text-navy text-xs rounded-full">
+                              <Tag className="w-2 h-2" />
+                              +{post.tags.length - 3} more
+                            </span>
+                          )}
+                        </div>
+                      )}
                     </div>
                     
                     <div className="flex items-center justify-between text-xs text-navy/60 mt-4 pt-4 border-t border-mint/20">
                       <div className="flex items-center gap-1">
                         <User className="w-3 h-3" />
-                        <span>{post.author}</span>
+                        <span>Editorial Team</span>
                       </div>
                       <div className="flex items-center gap-1">
                         <Calendar className="w-3 h-3" />
-                        <span>{new Date(post.date).toLocaleDateString()}</span>
+                        <span>
+                          {post.published_at 
+                            ? format(new Date(post.published_at), 'MMM dd, yyyy')
+                            : format(new Date(post.created_at), 'MMM dd, yyyy')
+                          }
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -121,12 +145,14 @@ const BlogPostsSection = () => {
 
         {/* View All Button */}
         <div className="text-center">
-          <Button 
-            className="bg-gradient-to-r from-blue to-navy text-white border-0 hover:shadow-xl transition-all duration-300 rounded-xl px-6 py-3 font-semibold group"
-          >
-            <span>Read More Articles</span>
-            <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
-          </Button>
+          <Link to="/blog">
+            <Button 
+              className="bg-gradient-to-r from-blue to-navy text-white border-0 hover:shadow-xl transition-all duration-300 rounded-xl px-6 py-3 font-semibold group"
+            >
+              <span>Read More Articles</span>
+              <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
+            </Button>
+          </Link>
         </div>
       </div>
     </div>
