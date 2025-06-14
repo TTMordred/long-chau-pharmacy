@@ -1,4 +1,3 @@
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/components/ui/use-toast';
@@ -6,6 +5,21 @@ import type { Tables } from '@/integrations/supabase/types';
 
 export type CMSPage = Tables<'cms_pages'>;
 export type CMSBlogPost = Tables<'cms_blog_posts'>;
+export interface CMSHealthPost {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt?: string;
+  content?: string;
+  category?: string;
+  tags?: string[];
+  featured_image_url?: string;
+  status?: 'draft' | 'published' | 'archived';
+  author_id: string;
+  published_at?: string;
+  created_at: string;
+  updated_at: string;
+}
 
 export const useCMSPages = () => {
   return useQuery({

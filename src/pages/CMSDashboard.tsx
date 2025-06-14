@@ -1,6 +1,7 @@
+
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Settings, FileText, BookOpen, Users, LayoutGrid, Package } from 'lucide-react';
+import { Plus, Settings, FileText, BookOpen, Users, Package, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -10,9 +11,9 @@ import DashboardHeader from '@/components/DashboardHeader';
 import PrescriptionList from '@/components/prescription/PrescriptionList';
 import PrescriptionModal from '@/components/prescription/PrescriptionModal';
 import PrescriptionStats from '@/components/cms/PrescriptionStats';
-import PagesManagement from '@/components/cms/PagesManagement';
 import BlogPostsManagement from '@/components/cms/BlogPostsManagement';
 import ProductsManagement from '@/components/cms/ProductsManagement';
+import HealthPostsManagement from '@/components/cms/HealthPostsManagement';
 import type { Prescription } from '@/hooks/usePrescriptions';
 
 const CMSDashboard = () => {
@@ -149,20 +150,20 @@ const CMSDashboard = () => {
               )}
               {canManageContent && (
                 <TabsTrigger 
-                  value="pages" 
-                  className="flex items-center gap-2 h-12 data-[state=active]:bg-navy data-[state=active]:text-white"
-                >
-                  <LayoutGrid className="w-4 h-4" />
-                  Pages
-                </TabsTrigger>
-              )}
-              {canManageContent && (
-                <TabsTrigger 
                   value="blog" 
                   className="flex items-center gap-2 h-12 data-[state=active]:bg-navy data-[state=active]:text-white"
                 >
                   <BookOpen className="w-4 h-4" />
                   Blog Posts
+                </TabsTrigger>
+              )}
+              {canManageContent && (
+                <TabsTrigger 
+                  value="health" 
+                  className="flex items-center gap-2 h-12 data-[state=active]:bg-navy data-[state=active]:text-white"
+                >
+                  <Heart className="w-4 h-4" />
+                  Health Posts
                 </TabsTrigger>
               )}
               {isAdmin && (
@@ -193,14 +194,14 @@ const CMSDashboard = () => {
             )}
 
             {canManageContent && (
-              <TabsContent value="pages">
-                <PagesManagement />
+              <TabsContent value="blog">
+                <BlogPostsManagement />
               </TabsContent>
             )}
 
             {canManageContent && (
-              <TabsContent value="blog">
-                <BlogPostsManagement />
+              <TabsContent value="health">
+                <HealthPostsManagement />
               </TabsContent>
             )}
 

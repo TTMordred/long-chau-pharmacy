@@ -11,6 +11,7 @@ import Auth from "./pages/Auth";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import UploadPrescription from "./pages/UploadPrescription";
 import CMSDashboard from "./pages/CMSDashboard";
+import Health from "./pages/Health";
 
 const queryClient = new QueryClient();
 
@@ -28,6 +29,7 @@ const App = () => (
               <Route path="/payment-success" element={<PaymentSuccess />} />
               <Route path="/upload-prescription" element={<UploadPrescription />} />
               <Route path="/cms-dashboard" element={<CMSDashboard />} />
+              <Route path="/health" element={<Health />} />
             </Routes>
           </Suspense>
         </BrowserRouter>

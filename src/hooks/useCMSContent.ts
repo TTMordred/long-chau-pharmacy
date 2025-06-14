@@ -1,8 +1,7 @@
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/components/ui/use-toast';
-import { CMSPage, CMSBlogPost } from '@/hooks/useCMS';
+import { CMSPage, CMSBlogPost, CMSHealthPost } from '@/hooks/useCMS';
 import type { Product } from '@/hooks/useProducts';
 
 // Create types that exclude fields handled by the backend
@@ -332,6 +331,141 @@ export const useDeleteBlogPost = () => {
       toast({
         title: "Failed to delete blog post",
         description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+};
+
+// Health Posts hooks
+export const useHealthPosts = () => {
+  return useQuery({
+    queryKey: ['cms-health-posts'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('cms_health_posts')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      return data;
+    },
+  });
+};
+
+export const useCreateHealthPost = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async (postData: {
+      title: string;
+      slug: string;
+      excerpt?: string;
+      content?: string;
+      category?: string;
+      tags?: string[];
+      featured_image_url?: string;
+      status?: string;
+    }) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('User not authenticated');
+
+      const { data, error } = await supabase
+        .from('cms_health_posts')
+        .insert({
+          ...postData,
+          author_id: user.id,
+          published_at: postData.status === 'published' ? new Date().toISOString() : null,
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['cms-health-posts'] });
+      toast({
+        title: "Success",
+        description: "Health post created successfully!",
+      });
+    },
+    onError: (error) => {
+      console.error('Health post creation error:', error);
+      toast({
+        title: "Error",
+        description: "Failed to create health post. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+};
+
+export const useUpdateHealthPost = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async ({ id, updates }: { id: string; updates: any }) => {
+      const updateData = {
+        ...updates,
+        published_at: updates.status === 'published' && !updates.published_at 
+          ? new Date().toISOString() 
+          : updates.published_at,
+      };
+
+      const { data, error } = await supabase
+        .from('cms_health_posts')
+        .update(updateData)
+        .eq('id', id)
+        .select()
+        .maybeSingle();
+
+      if (error) throw error;
+      if (!data) throw new Error('Health post not found or no changes made');
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['cms-health-posts'] });
+      toast({
+        title: "Success",
+        description: "Health post updated successfully!",
+      });
+    },
+    onError: (error) => {
+      console.error('Health post update error:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update health post. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+};
+
+export const useDeleteHealthPost = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from('cms_health_posts')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['cms-health-posts'] });
+      toast({
+        title: "Success",
+        description: "Health post deleted successfully!",
+      });
+    },
+    onError: (error) => {
+      console.error('Health post deletion error:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete health post. Please try again.",
         variant: "destructive",
       });
     },
