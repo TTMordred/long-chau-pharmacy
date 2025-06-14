@@ -31,9 +31,43 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+      async (event, session) => {
+        console.log('Auth event:', event, session?.user?.id);
         setSession(session);
         setUser(session?.user ?? null);
+        
+        // Create profile when user signs in if it doesn't exist
+        if (event === 'SIGNED_IN' && session?.user) {
+          setTimeout(async () => {
+            try {
+              const { data: profile, error } = await supabase
+                .from('profiles')
+                .select('id')
+                .eq('id', session.user.id)
+                .single();
+
+              if (error && error.code === 'PGRST116') {
+                // Profile doesn't exist, create it
+                const { error: createError } = await supabase
+                  .from('profiles')
+                  .insert({
+                    id: session.user.id,
+                    email: session.user.email,
+                    full_name: session.user.user_metadata?.full_name || 'User',
+                  });
+
+                if (createError) {
+                  console.error('Error creating profile:', createError);
+                } else {
+                  console.log('Profile created successfully');
+                }
+              }
+            } catch (error) {
+              console.error('Error checking/creating profile:', error);
+            }
+          }, 100);
+        }
+        
         setLoading(false);
       }
     );
@@ -49,49 +83,63 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   const signUp = async (email: string, password: string, fullName: string) => {
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: `${window.location.origin}/`,
-        data: {
-          full_name: fullName,
+    try {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/`,
+          data: {
+            full_name: fullName,
+          }
         }
-      }
-    });
-
-    if (!error) {
-      toast({
-        title: "Account created!",
-        description: "Please check your email to verify your account.",
       });
-    }
 
-    return { error };
+      if (!error) {
+        toast({
+          title: "Account created!",
+          description: "Please check your email to verify your account.",
+        });
+      }
+
+      return { error };
+    } catch (error) {
+      console.error('Sign up error:', error);
+      return { error };
+    }
   };
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (!error) {
-      toast({
-        title: "Welcome back!",
-        description: "You have successfully signed in.",
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
       });
-    }
 
-    return { error };
+      if (!error) {
+        toast({
+          title: "Welcome back!",
+          description: "You have successfully signed in.",
+        });
+      }
+
+      return { error };
+    } catch (error) {
+      console.error('Sign in error:', error);
+      return { error };
+    }
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
-    toast({
-      title: "Signed out",
-      description: "You have been successfully signed out.",
-    });
+    try {
+      await supabase.auth.signOut();
+      toast({
+        title: "Signed out",
+        description: "You have been successfully signed out.",
+      });
+    } catch (error) {
+      console.error('Sign out error:', error);
+    }
   };
 
   return (

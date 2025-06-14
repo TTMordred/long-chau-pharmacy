@@ -31,6 +31,34 @@ export const useCreatePrescription = () => {
   
   return useMutation({
     mutationFn: async (prescription: NewPrescription) => {
+      // First ensure user profile exists
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('User not authenticated');
+
+      // Check if profile exists, create if not
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('id', user.id)
+        .single();
+
+      if (profileError && profileError.code === 'PGRST116') {
+        // Profile doesn't exist, create it
+        const { error: createProfileError } = await supabase
+          .from('profiles')
+          .insert({
+            id: user.id,
+            email: user.email,
+            full_name: user.user_metadata?.full_name || 'Unknown User',
+          });
+
+        if (createProfileError) {
+          console.error('Error creating profile:', createProfileError);
+          throw new Error('Failed to create user profile');
+        }
+      }
+
+      // Now create the prescription
       const { data, error } = await supabase
         .from('prescriptions')
         .insert(prescription)
@@ -48,9 +76,10 @@ export const useCreatePrescription = () => {
       });
     },
     onError: (error) => {
+      console.error('Prescription upload error:', error);
       toast({
         title: "Upload failed",
-        description: error.message,
+        description: error.message || "Failed to upload prescription. Please try again.",
         variant: "destructive",
       });
     },
