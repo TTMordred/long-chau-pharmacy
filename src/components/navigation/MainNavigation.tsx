@@ -69,14 +69,10 @@ const MainNavigation = ({ cartItemsCount, onCartClick }: MainNavigationProps) =>
       href: '/health',
       icon: Heart,
     },
-  ];
-
-  const userMenuItems = [
     {
       title: 'Upload Prescription',
       href: '/upload-prescription',
       icon: Upload,
-      requiresAuth: true,
     },
   ];
 
@@ -119,16 +115,6 @@ const MainNavigation = ({ cartItemsCount, onCartClick }: MainNavigationProps) =>
           <NavigationMenuList className="flex space-x-1">
             {/* Main Navigation Items */}
             {navigationItems.map((item) => (
-              <NavigationMenuItem key={item.title}>
-                <NavLink href={item.href}>
-                  <item.icon className="w-4 h-4 mr-2 transition-transform duration-200 group-hover:scale-110" />
-                  {item.title}
-                </NavLink>
-              </NavigationMenuItem>
-            ))}
-
-            {/* User Menu Items */}
-            {user && userMenuItems.map((item) => (
               <NavigationMenuItem key={item.title}>
                 <NavLink href={item.href}>
                   <item.icon className="w-4 h-4 mr-2 transition-transform duration-200 group-hover:scale-110" />
@@ -216,13 +202,6 @@ const MainNavigation = ({ cartItemsCount, onCartClick }: MainNavigationProps) =>
                 <div className="text-gray-500 text-xs">{user.email}</div>
               </div>
               <DropdownMenuSeparator className="bg-gray-200/50" />
-              <DropdownMenuItem 
-                onClick={() => navigate('/upload-prescription')}
-                className="rounded-lg mx-1 transition-all duration-200 hover:bg-accent/50 hover:scale-[1.02] cursor-pointer"
-              >
-                <Upload className="w-4 h-4 mr-2" />
-                Upload Prescription
-              </DropdownMenuItem>
               {isAdmin && (
                 <DropdownMenuItem 
                   onClick={() => navigate('/cms-dashboard')}
@@ -288,26 +267,6 @@ const MainNavigation = ({ cartItemsCount, onCartClick }: MainNavigationProps) =>
           <div className="max-w-7xl mx-auto px-4 py-4">
             <div className="space-y-2">
               {navigationItems.map((item) => (
-                <button
-                  key={item.title}
-                  onClick={() => {
-                    navigate(item.href);
-                    setIsMobileMenuOpen(false);
-                  }}
-                  className={cn(
-                    "flex items-center space-x-3 w-full px-4 py-3 rounded-lg text-left transition-all duration-200 hover:scale-[1.02] relative overflow-hidden group",
-                    isActiveRoute(item.href) 
-                      ? "bg-accent text-accent-foreground shadow-sm" 
-                      : "hover:bg-accent/50 hover:text-accent-foreground"
-                  )}
-                >
-                  <item.icon className="w-4 h-4 transition-transform duration-200 group-hover:scale-110" />
-                  <span className="font-medium">{item.title}</span>
-                  <div className="absolute inset-0 bg-gradient-to-r from-blue/5 to-navy/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
-                </button>
-              ))}
-
-              {user && userMenuItems.map((item) => (
                 <button
                   key={item.title}
                   onClick={() => {
