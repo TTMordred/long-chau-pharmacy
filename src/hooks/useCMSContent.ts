@@ -28,6 +28,22 @@ type CreateProductInput = {
   sku?: string | null;
 };
 
+// Create a proper type for product updates that allows partial updates
+type UpdateProductInput = {
+  name?: string;
+  company?: string;
+  price?: number;
+  description?: string | null;
+  original_price?: number | null;
+  category_id?: string | null;
+  stock_quantity?: number;
+  status?: string;
+  prescription_required?: boolean;
+  image_url?: string | null;
+  sku?: string | null;
+  updated_at?: string;
+};
+
 // Pages
 export const usePages = () => {
   return useQuery({
@@ -358,7 +374,7 @@ export const useUpdateProduct = () => {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: async ({ id, updates }: { id: string; updates: Partial<Product> }) => {
+    mutationFn: async ({ id, updates }: { id: string; updates: UpdateProductInput }) => {
       const updateData = {
         ...updates,
         updated_at: new Date().toISOString(),
