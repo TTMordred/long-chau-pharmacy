@@ -248,20 +248,22 @@ const CMSDashboard = () => {
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead>Patient</TableHead>
-                          <TableHead>Doctor</TableHead>
+                          <TableHead>Customer ID</TableHead>
                           <TableHead>Status</TableHead>
                           <TableHead>Uploaded</TableHead>
+                          <TableHead>Reviewed</TableHead>
                           <TableHead>Actions</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
                         {prescriptions?.map((prescription) => (
                           <TableRow key={prescription.id}>
-                            <TableCell>{prescription.patient_name || '-'}</TableCell>
-                            <TableCell>{prescription.doctor_name || '-'}</TableCell>
+                            <TableCell>{prescription.customer_id.slice(0, 8)}...</TableCell>
                             <TableCell>{getStatusBadge(prescription.status || 'pending')}</TableCell>
                             <TableCell>{new Date(prescription.uploaded_at).toLocaleDateString()}</TableCell>
+                            <TableCell>
+                              {prescription.reviewed_at ? new Date(prescription.reviewed_at).toLocaleDateString() : '-'}
+                            </TableCell>
                             <TableCell>
                               <div className="flex items-center gap-2">
                                 <Button variant="outline" size="sm">

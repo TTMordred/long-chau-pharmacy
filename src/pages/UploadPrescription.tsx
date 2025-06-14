@@ -19,11 +19,8 @@ const UploadPrescription = () => {
   const createPrescription = useCreatePrescription();
   
   const [formData, setFormData] = useState({
-    doctorName: '',
-    doctorLicense: '',
-    patientName: '',
     prescriptionText: '',
-    expiryDate: '',
+    pharmacistNotes: '',
   });
   const [prescriptionFile, setPrescriptionFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -70,11 +67,8 @@ const UploadPrescription = () => {
 
       await createPrescription.mutateAsync({
         customer_id: user.id,
-        doctor_name: formData.doctorName,
-        doctor_license: formData.doctorLicense,
-        patient_name: formData.patientName,
-        prescription_text: formData.prescriptionText,
         prescription_image_url: prescriptionImageUrl,
+        pharmacist_notes: formData.pharmacistNotes,
         status: 'pending',
       });
 
@@ -150,6 +144,7 @@ const UploadPrescription = () => {
                       accept="image/*,.pdf"
                       onChange={handleFileChange}
                       className="hidden"
+                      required
                     />
                     <label htmlFor="prescription-file" className="cursor-pointer">
                       <Upload className="w-8 h-8 mx-auto mb-2 text-blue" />
@@ -163,56 +158,14 @@ const UploadPrescription = () => {
                   </div>
                 </div>
 
-                {/* Doctor Information */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="doctor-name" className="flex items-center gap-2">
-                      <Stethoscope className="w-4 h-4" />
-                      Doctor Name
-                    </Label>
-                    <Input
-                      id="doctor-name"
-                      placeholder="Dr. John Smith"
-                      value={formData.doctorName}
-                      onChange={(e) => setFormData({ ...formData, doctorName: e.target.value })}
-                      required
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="doctor-license">Doctor License Number</Label>
-                    <Input
-                      id="doctor-license"
-                      placeholder="License number"
-                      value={formData.doctorLicense}
-                      onChange={(e) => setFormData({ ...formData, doctorLicense: e.target.value })}
-                    />
-                  </div>
-                </div>
-
-                {/* Patient Information */}
+                {/* Notes */}
                 <div className="space-y-2">
-                  <Label htmlFor="patient-name" className="flex items-center gap-2">
-                    <User className="w-4 h-4" />
-                    Patient Name
-                  </Label>
-                  <Input
-                    id="patient-name"
-                    placeholder="Patient full name"
-                    value={formData.patientName}
-                    onChange={(e) => setFormData({ ...formData, patientName: e.target.value })}
-                    required
-                  />
-                </div>
-
-                {/* Prescription Details */}
-                <div className="space-y-2">
-                  <Label htmlFor="prescription-text">Prescription Details (Optional)</Label>
+                  <Label htmlFor="pharmacist-notes">Additional Notes (Optional)</Label>
                   <Textarea
-                    id="prescription-text"
-                    placeholder="Enter prescription details if image is unclear..."
-                    value={formData.prescriptionText}
-                    onChange={(e) => setFormData({ ...formData, prescriptionText: e.target.value })}
+                    id="pharmacist-notes"
+                    placeholder="Any additional information for the pharmacist..."
+                    value={formData.pharmacistNotes}
+                    onChange={(e) => setFormData({ ...formData, pharmacistNotes: e.target.value })}
                     rows={4}
                   />
                 </div>

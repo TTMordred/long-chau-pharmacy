@@ -2,7 +2,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/components/ui/use-toast';
-import type { Tables } from '@/integrations/supabase/types';
+import type { Tables, Enums } from '@/integrations/supabase/types';
 
 export type UserRole = Tables<'user_roles'>;
 
@@ -30,7 +30,7 @@ export const useHasRole = (role: string) => {
     queryFn: async () => {
       const { data, error } = await supabase.rpc('has_role', {
         _user_id: (await supabase.auth.getUser()).data.user?.id,
-        _role: role,
+        _role: role as Enums<'user_role'>,
       });
       
       if (error) throw error;
@@ -43,10 +43,10 @@ export const useAssignRole = () => {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: async ({ userId, role }: { userId: string; role: string }) => {
+    mutationFn: async ({ userId, role }: { userId: string; role: Enums<'user_role'> }) => {
       const { data, error } = await supabase
         .from('user_roles')
-        .insert({ user_id: userId, role: role as any })
+        .insert({ user_id: userId, role: role })
         .select()
         .single();
       
