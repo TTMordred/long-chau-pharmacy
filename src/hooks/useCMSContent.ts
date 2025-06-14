@@ -13,6 +13,21 @@ type CreateBlogPostInput = Omit<CMSBlogPost, 'id' | 'created_at' | 'updated_at' 
   published_at?: string | null;
 };
 
+// Create a proper type for product creation that ensures required fields
+type CreateProductInput = {
+  name: string;
+  company: string;
+  price: number;
+  description?: string | null;
+  original_price?: number | null;
+  category_id?: string | null;
+  stock_quantity?: number;
+  status?: string;
+  prescription_required?: boolean;
+  image_url?: string | null;
+  sku?: string | null;
+};
+
 // Pages
 export const usePages = () => {
   return useQuery({
@@ -312,7 +327,7 @@ export const useCreateProduct = () => {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: async (product: Partial<Product>) => {
+    mutationFn: async (product: CreateProductInput) => {
       const { data, error } = await supabase
         .from('products')
         .insert(product)

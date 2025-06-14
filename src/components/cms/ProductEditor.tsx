@@ -24,10 +24,25 @@ import { useUploadCMSMedia } from '@/hooks/useCMSContent';
 import { toast } from '@/components/ui/use-toast';
 import type { Product, Category } from '@/hooks/useProducts';
 
+// Define the proper input type for creating products
+type ProductInput = {
+  name: string;
+  company: string;
+  price: number;
+  description?: string | null;
+  original_price?: number | null;
+  category_id?: string | null;
+  stock_quantity?: number;
+  status?: string;
+  prescription_required?: boolean;
+  image_url?: string | null;
+  sku?: string | null;
+};
+
 interface ProductEditorProps {
   initialData?: Product | null;
   categories: Category[];
-  onSave: (data: Partial<Product>) => void;
+  onSave: (data: ProductInput) => void;
   onCancel: () => void;
 }
 
@@ -114,7 +129,7 @@ const ProductEditor = ({ initialData, categories, onSave, onCancel }: ProductEdi
       return;
     }
 
-    const productData: Partial<Product> = {
+    const productData: ProductInput = {
       name: formData.name.trim(),
       company: formData.company.trim(),
       description: formData.description.trim() || null,

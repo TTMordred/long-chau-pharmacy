@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Plus, Pencil, Trash2, Eye, Package, ArrowUpDown } from 'lucide-react';
 import {
@@ -41,6 +40,21 @@ import { format } from 'date-fns';
 import ProductEditor from './ProductEditor';
 import type { Product } from '@/hooks/useProducts';
 
+// Define the proper input type for creating products
+type ProductInput = {
+  name: string;
+  company: string;
+  price: number;
+  description?: string | null;
+  original_price?: number | null;
+  category_id?: string | null;
+  stock_quantity?: number;
+  status?: string;
+  prescription_required?: boolean;
+  image_url?: string | null;
+  sku?: string | null;
+};
+
 const ProductsManagement = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
@@ -56,7 +70,7 @@ const ProductsManagement = () => {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [isConfirmingDelete, setIsConfirmingDelete] = useState<string | null>(null);
 
-  const handleCreateProduct = async (productData: Partial<Product>) => {
+  const handleCreateProduct = async (productData: ProductInput) => {
     try {
       await createProduct.mutateAsync(productData);
       setIsCreating(false);
@@ -65,7 +79,7 @@ const ProductsManagement = () => {
     }
   };
 
-  const handleUpdateProduct = async (productData: Partial<Product>) => {
+  const handleUpdateProduct = async (productData: ProductInput) => {
     if (!editingProduct) return;
     
     try {
