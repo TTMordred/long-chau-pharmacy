@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { 
@@ -68,6 +67,11 @@ const MainNavigation = ({ cartItemsCount, onCartClick }: MainNavigationProps) =>
       title: 'Health & Wellness',
       href: '/health',
       icon: Heart,
+    },
+    {
+      title: 'Blog Posts',
+      href: '/blog',
+      icon: BookOpen,
     },
     {
       title: 'Upload Prescription',

@@ -1,5 +1,6 @@
+
 import { useState } from 'react';
-import { Plus, Pencil, Trash2, Eye, BookOpen, ArrowUpDown } from 'lucide-react';
+import { Plus, Pencil, Trash2, Eye, BookOpen, ArrowUpDown, Filter, Search, Sparkles } from 'lucide-react';
 import {
   Card,
   CardContent,
@@ -66,8 +67,17 @@ const BlogPostsManagement = () => {
         status: postData.status || 'draft',
       });
       setIsCreating(false);
+      toast({
+        title: "Blog post created! 🎉",
+        description: "Your blog post has been created successfully.",
+      });
     } catch (error) {
       console.error('Failed to create post:', error);
+      toast({
+        title: "Error creating post",
+        description: "There was an error creating your blog post. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -80,8 +90,17 @@ const BlogPostsManagement = () => {
         updates: postData,
       });
       setEditingPost(null);
+      toast({
+        title: "Post updated! ✨",
+        description: "Your blog post has been updated successfully.",
+      });
     } catch (error) {
       console.error('Failed to update post:', error);
+      toast({
+        title: "Error updating post",
+        description: "There was an error updating your blog post. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -89,25 +108,40 @@ const BlogPostsManagement = () => {
     try {
       await deletePost.mutateAsync(id);
       setIsConfirmingDelete(null);
+      toast({
+        title: "Post deleted",
+        description: "The blog post has been permanently deleted.",
+      });
     } catch (error) {
       console.error('Failed to delete post:', error);
+      toast({
+        title: "Error deleting post",
+        description: "There was an error deleting the blog post. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'published':
-        return <Badge className="bg-green-500">Published</Badge>;
+        return <Badge className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white shadow-md">Published</Badge>;
       case 'archived':
-        return <Badge variant="outline" className="text-gray-500">Archived</Badge>;
+        return <Badge variant="outline" className="text-gray-500 border-gray-300">Archived</Badge>;
       default:
-        return <Badge variant="secondary">Draft</Badge>;
+        return <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-md">Draft</Badge>;
     }
   };
 
   const getCategoryBadge = (category: string) => {
     if (!category) return null;
-    return <Badge variant="outline">{category}</Badge>;
+    const colors: { [key: string]: string } = {
+      'technology': 'bg-blue-100 text-blue-700 border-blue-200',
+      'health': 'bg-green-100 text-green-700 border-green-200',
+      'lifestyle': 'bg-purple-100 text-purple-700 border-purple-200',
+      'business': 'bg-orange-100 text-orange-700 border-orange-200',
+    };
+    return <Badge variant="outline" className={`${colors[category] || 'bg-gray-100 text-gray-700 border-gray-200'} font-medium`}>{category}</Badge>;
   };
   
   const uniqueCategories = posts 
@@ -128,13 +162,16 @@ const BlogPostsManagement = () => {
 
   if (error) {
     return (
-      <Card>
+      <Card className="border-red-200 bg-red-50">
         <CardHeader>
-          <CardTitle>Blog Posts Management</CardTitle>
-          <CardDescription>Error loading blog posts</CardDescription>
+          <CardTitle className="text-red-700 flex items-center">
+            <BookOpen className="w-5 h-5 mr-2" />
+            Blog Posts Management
+          </CardTitle>
+          <CardDescription className="text-red-600">Error loading blog posts</CardDescription>
         </CardHeader>
         <CardContent>
-          <p className="text-red-500">Failed to load blog posts: {error.message}</p>
+          <p className="text-red-600">Failed to load blog posts: {error.message}</p>
         </CardContent>
       </Card>
     );
@@ -168,191 +205,265 @@ const BlogPostsManagement = () => {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex justify-between items-center">
-          <div>
-            <CardTitle className="text-2xl">Blog Posts Management</CardTitle>
-            <CardDescription>Create and manage blog posts</CardDescription>
+    <div className="space-y-6">
+      {/* Header Section */}
+      <Card className="bg-gradient-to-r from-purple-50 to-indigo-50 border-purple-200">
+        <CardHeader>
+          <div className="flex justify-between items-start">
+            <div className="space-y-2">
+              <CardTitle className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent flex items-center">
+                <Sparkles className="w-8 h-8 mr-3 text-purple-600" />
+                Blog Posts Management
+              </CardTitle>
+              <CardDescription className="text-lg text-purple-700">
+                Create and manage engaging blog posts for your audience
+              </CardDescription>
+              <div className="flex items-center space-x-4 pt-2">
+                <div className="flex items-center space-x-2">
+                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                  <span className="text-sm text-gray-600">{filteredPosts.filter(p => p.status === 'published').length} Published</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="w-3 h-3 bg-amber-500 rounded-full"></div>
+                  <span className="text-sm text-gray-600">{filteredPosts.filter(p => p.status === 'draft').length} Drafts</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="w-3 h-3 bg-gray-400 rounded-full"></div>
+                  <span className="text-sm text-gray-600">{filteredPosts.filter(p => p.status === 'archived').length} Archived</span>
+                </div>
+              </div>
+            </div>
+            <Button 
+              onClick={() => setIsCreating(true)} 
+              className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+              size="lg"
+            >
+              <Plus className="mr-2 h-5 w-5" /> 
+              Create New Post
+            </Button>
           </div>
-          <Button onClick={() => setIsCreating(true)} className="bg-gradient-to-r from-purple-600 to-indigo-600">
-            <Plus className="mr-2 h-4 w-4" /> Create New Post
-          </Button>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="flex flex-wrap gap-4 items-center mb-6">
-          <div className="flex-1">
-            <Input
-              placeholder="Search posts..."
-              className="w-full"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-32">
-              <SelectValue placeholder="Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All</SelectItem>
-              <SelectItem value="draft">Draft</SelectItem>
-              <SelectItem value="published">Published</SelectItem>
-              <SelectItem value="archived">Archived</SelectItem>
-            </SelectContent>
-          </Select>
-          {uniqueCategories.length > 0 && (
-            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-              <SelectTrigger className="w-40">
-                <SelectValue placeholder="Category" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Categories</SelectItem>
-                {uniqueCategories.map((category) => (
-                  <SelectItem key={category} value={category}>
-                    {category}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          )}
-        </div>
+        </CardHeader>
+      </Card>
 
-        {isLoading ? (
-          <div className="flex justify-center items-center py-12">
-            <p>Loading posts...</p>
+      {/* Filters Section */}
+      <Card className="bg-white/80 backdrop-blur-sm border-gray-200">
+        <CardContent className="pt-6">
+          <div className="flex flex-col lg:flex-row gap-4 items-end">
+            <div className="flex-1">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Search Posts</label>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <Input
+                  placeholder="Search by title, content, or slug..."
+                  className="pl-10 h-10 bg-white border-gray-300 rounded-lg"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
+            </div>
+            
+            <div className="flex gap-3 w-full lg:w-auto">
+              <div className="flex-1 lg:w-40">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger className="h-10 bg-white border-gray-300 rounded-lg">
+                    <SelectValue placeholder="Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Status</SelectItem>
+                    <SelectItem value="draft">Draft</SelectItem>
+                    <SelectItem value="published">Published</SelectItem>
+                    <SelectItem value="archived">Archived</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              {uniqueCategories.length > 0 && (
+                <div className="flex-1 lg:w-48">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                  <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                    <SelectTrigger className="h-10 bg-white border-gray-300 rounded-lg">
+                      <SelectValue placeholder="Category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Categories</SelectItem>
+                      {uniqueCategories.map((category) => (
+                        <SelectItem key={category} value={category}>
+                          {category.charAt(0).toUpperCase() + category.slice(1)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+            </div>
           </div>
-        ) : filteredPosts.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 text-center">
-            <BookOpen className="h-12 w-12 text-muted-foreground mb-4" />
-            <h3 className="text-lg font-medium">No blog posts found</h3>
-            {searchQuery || statusFilter !== 'all' || categoryFilter !== 'all' ? (
-              <p className="text-muted-foreground">
-                No posts match your current filters. Try adjusting your search.
-              </p>
-            ) : (
-              <p className="text-muted-foreground mt-2 mb-6">
-                Get started by creating your first blog post.
-              </p>
-            )}
-            {searchQuery || statusFilter !== 'all' || categoryFilter !== 'all' ? (
-              <Button variant="outline" onClick={() => {
-                setSearchQuery('');
-                setStatusFilter('all');
-                setCategoryFilter('all');
-              }}>
-                Clear Filters
-              </Button>
-            ) : (
-              <Button onClick={() => setIsCreating(true)}>
-                <Plus className="mr-2 h-4 w-4" /> Create Post
-              </Button>
-            )}
-          </div>
-        ) : (
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[300px]">
-                    <div className="flex items-center">
-                      Title
-                      <ArrowUpDown className="ml-2 h-3 w-3" />
-                    </div>
-                  </TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Last Updated</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredPosts.map((post) => (
-                  <TableRow key={post.id}>
-                    <TableCell className="font-medium">
-                      <div className="flex flex-col">
-                        <span>{post.title}</span>
-                        <span className="text-xs text-muted-foreground">/blog/{post.slug}</span>
+        </CardContent>
+      </Card>
+
+      {/* Content Section */}
+      <Card>
+        <CardContent className="p-0">
+          {isLoading ? (
+            <div className="flex justify-center items-center py-20">
+              <div className="text-center space-y-4">
+                <div className="w-12 h-12 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin mx-auto"></div>
+                <p className="text-lg text-gray-600">Loading your amazing content...</p>
+              </div>
+            </div>
+          ) : filteredPosts.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-20 text-center">
+              <div className="p-6 bg-gradient-to-r from-purple-100 to-indigo-100 rounded-full mb-6">
+                <BookOpen className="h-16 w-16 text-purple-600" />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">No blog posts found</h3>
+              {searchQuery || statusFilter !== 'all' || categoryFilter !== 'all' ? (
+                <div className="space-y-4">
+                  <p className="text-gray-600 text-lg max-w-md">
+                    No posts match your current filters. Try adjusting your search criteria.
+                  </p>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => {
+                      setSearchQuery('');
+                      setStatusFilter('all');
+                      setCategoryFilter('all');
+                    }}
+                    className="rounded-lg"
+                  >
+                    <Filter className="mr-2 h-4 w-4" />
+                    Clear All Filters
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <p className="text-gray-600 text-lg max-w-md">
+                    Get started by creating your first amazing blog post.
+                  </p>
+                  <Button 
+                    onClick={() => setIsCreating(true)}
+                    className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
+                  >
+                    <Plus className="mr-2 h-4 w-4" /> 
+                    Create Your First Post
+                  </Button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="rounded-lg border border-gray-200 overflow-hidden">
+              <Table>
+                <TableHeader className="bg-gray-50">
+                  <TableRow>
+                    <TableHead className="w-[300px] font-semibold">
+                      <div className="flex items-center">
+                        Title & URL
+                        <ArrowUpDown className="ml-2 h-3 w-3 text-gray-400" />
                       </div>
-                    </TableCell>
-                    <TableCell>{post.category ? getCategoryBadge(post.category) : '-'}</TableCell>
-                    <TableCell>{getStatusBadge(post.status || 'draft')}</TableCell>
-                    <TableCell>
-                      {post.updated_at
-                        ? format(new Date(post.updated_at), 'MMM dd, yyyy')
-                        : 'Not available'}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => {
-                            // TODO: Implement post preview
-                            toast({
-                              title: "Preview",
-                              description: `Preview for /blog/${post.slug}`,
-                            });
-                          }}
-                        >
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => setEditingPost(post)}
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Dialog
-                          open={isConfirmingDelete === post.id}
-                          onOpenChange={(open) => {
-                            if (!open) setIsConfirmingDelete(null);
-                          }}
-                        >
-                          <DialogTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => setIsConfirmingDelete(post.id)}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent>
-                            <DialogHeader>
-                              <DialogTitle>Delete Blog Post</DialogTitle>
-                              <DialogDescription>
-                                Are you sure you want to delete the blog post "{post.title}"?
-                                This action cannot be undone.
-                              </DialogDescription>
-                            </DialogHeader>
-                            <div className="flex justify-end gap-2 mt-4">
-                              <Button
-                                variant="outline"
-                                onClick={() => setIsConfirmingDelete(null)}
-                              >
-                                Cancel
-                              </Button>
-                              <Button
-                                variant="destructive"
-                                onClick={() => handleDeletePost(post.id)}
-                              >
-                                Delete
-                              </Button>
-                            </div>
-                          </DialogContent>
-                        </Dialog>
-                      </div>
-                    </TableCell>
+                    </TableHead>
+                    <TableHead className="font-semibold">Category</TableHead>
+                    <TableHead className="font-semibold">Status</TableHead>
+                    <TableHead className="font-semibold">Last Updated</TableHead>
+                    <TableHead className="text-right font-semibold">Actions</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-        )}
-      </CardContent>
-    </Card>
+                </TableHeader>
+                <TableBody>
+                  {filteredPosts.map((post) => (
+                    <TableRow key={post.id} className="hover:bg-gray-50 transition-colors">
+                      <TableCell className="font-medium">
+                        <div className="space-y-1">
+                          <div className="font-semibold text-gray-900 line-clamp-2">{post.title}</div>
+                          <div className="text-sm text-blue-600 font-mono bg-blue-50 px-2 py-1 rounded inline-block">
+                            /blog/{post.slug}
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        {post.category ? getCategoryBadge(post.category) : (
+                          <span className="text-gray-400 text-sm">No category</span>
+                        )}
+                      </TableCell>
+                      <TableCell>{getStatusBadge(post.status || 'draft')}</TableCell>
+                      <TableCell className="text-gray-600">
+                        {post.updated_at
+                          ? format(new Date(post.updated_at), 'MMM dd, yyyy')
+                          : 'Not available'}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-1">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              toast({
+                                title: "Preview Feature",
+                                description: `Preview for /blog/${post.slug} coming soon!`,
+                              });
+                            }}
+                            className="h-8 w-8 p-0 hover:bg-blue-100 hover:text-blue-600"
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setEditingPost(post)}
+                            className="h-8 w-8 p-0 hover:bg-purple-100 hover:text-purple-600"
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Dialog
+                            open={isConfirmingDelete === post.id}
+                            onOpenChange={(open) => {
+                              if (!open) setIsConfirmingDelete(null);
+                            }}
+                          >
+                            <DialogTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setIsConfirmingDelete(post.id)}
+                                className="h-8 w-8 p-0 hover:bg-red-100 hover:text-red-600"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent className="max-w-md">
+                              <DialogHeader>
+                                <DialogTitle className="text-red-600">Delete Blog Post</DialogTitle>
+                                <DialogDescription className="text-gray-600">
+                                  Are you sure you want to delete "<strong>{post.title}</strong>"?
+                                  This action cannot be undone and will permanently remove the post.
+                                </DialogDescription>
+                              </DialogHeader>
+                              <div className="flex justify-end gap-3 mt-6">
+                                <Button
+                                  variant="outline"
+                                  onClick={() => setIsConfirmingDelete(null)}
+                                >
+                                  Cancel
+                                </Button>
+                                <Button
+                                  variant="destructive"
+                                  onClick={() => handleDeletePost(post.id)}
+                                  className="bg-red-600 hover:bg-red-700"
+                                >
+                                  Delete Post
+                                </Button>
+                              </div>
+                            </DialogContent>
+                          </Dialog>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 
