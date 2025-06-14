@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Plus, Pencil, Trash2, Eye, BookOpen, ArrowUpDown } from 'lucide-react';
 import {
@@ -78,12 +77,7 @@ const BlogPostsManagement = () => {
     try {
       await updatePost.mutateAsync({
         id: editingPost.id,
-        updates: {
-          ...postData,
-          published_at: postData.status === 'published' && !editingPost.published_at
-            ? new Date().toISOString()
-            : editingPost.published_at
-        },
+        updates: postData,
       });
       setEditingPost(null);
     } catch (error) {

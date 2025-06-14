@@ -4,6 +4,15 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/components/ui/use-toast';
 import { CMSPage, CMSBlogPost } from '@/hooks/useCMS';
 
+// Create types that exclude fields handled by the backend
+type CreatePageInput = Omit<CMSPage, 'id' | 'created_at' | 'updated_at' | 'author_id' | 'published_at'> & {
+  published_at?: string | null;
+};
+
+type CreateBlogPostInput = Omit<CMSBlogPost, 'id' | 'created_at' | 'updated_at' | 'author_id' | 'published_at'> & {
+  published_at?: string | null;
+};
+
 // Pages
 export const usePages = () => {
   return useQuery({
@@ -43,13 +52,19 @@ export const useCreatePage = () => {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: async (page: Omit<CMSPage, 'id' | 'created_at' | 'updated_at'>) => {
+    mutationFn: async (page: CreatePageInput) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('User not authenticated');
 
+      const pageData = {
+        ...page,
+        author_id: user.id,
+        published_at: page.status === 'published' ? new Date().toISOString() : null,
+      };
+
       const { data, error } = await supabase
         .from('cms_pages')
-        .insert({ ...page, author_id: user.id })
+        .insert(pageData)
         .select()
         .single();
       
@@ -78,9 +93,19 @@ export const useUpdatePage = () => {
   
   return useMutation({
     mutationFn: async ({ id, updates }: { id: string; updates: Partial<CMSPage> }) => {
+      const updateData = {
+        ...updates,
+        updated_at: new Date().toISOString(),
+      };
+
+      // Set published_at if status is being changed to published and it's not already set
+      if (updates.status === 'published' && !updates.published_at) {
+        updateData.published_at = new Date().toISOString();
+      }
+
       const { data, error } = await supabase
         .from('cms_pages')
-        .update({ ...updates, updated_at: new Date().toISOString() })
+        .update(updateData)
         .eq('id', id)
         .select()
         .single();
@@ -174,13 +199,19 @@ export const useCreateBlogPost = () => {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: async (post: Omit<CMSBlogPost, 'id' | 'created_at' | 'updated_at'>) => {
+    mutationFn: async (post: CreateBlogPostInput) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('User not authenticated');
 
+      const postData = {
+        ...post,
+        author_id: user.id,
+        published_at: post.status === 'published' ? new Date().toISOString() : null,
+      };
+
       const { data, error } = await supabase
         .from('cms_blog_posts')
-        .insert({ ...post, author_id: user.id })
+        .insert(postData)
         .select()
         .single();
       
@@ -209,9 +240,19 @@ export const useUpdateBlogPost = () => {
   
   return useMutation({
     mutationFn: async ({ id, updates }: { id: string; updates: Partial<CMSBlogPost> }) => {
+      const updateData = {
+        ...updates,
+        updated_at: new Date().toISOString(),
+      };
+
+      // Set published_at if status is being changed to published and it's not already set
+      if (updates.status === 'published' && !updates.published_at) {
+        updateData.published_at = new Date().toISOString();
+      }
+
       const { data, error } = await supabase
         .from('cms_blog_posts')
-        .update({ ...updates, updated_at: new Date().toISOString() })
+        .update(updateData)
         .eq('id', id)
         .select()
         .single();
