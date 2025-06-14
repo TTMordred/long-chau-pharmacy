@@ -1,3 +1,4 @@
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/components/ui/use-toast';
@@ -385,10 +386,26 @@ export const useUpdateProduct = () => {
     mutationFn: async ({ id, updates }: { id: string; updates: UpdateProductInput }) => {
       console.log('Updating product with ID:', id, 'and data:', updates);
       
+      // First check if the product exists
+      const { data: existingProduct, error: checkError } = await supabase
+        .from('products')
+        .select('id')
+        .eq('id', id)
+        .maybeSingle();
+      
+      if (checkError) {
+        console.error('Error checking product existence:', checkError);
+        throw new Error('Failed to verify product existence');
+      }
+      
+      if (!existingProduct) {
+        throw new Error('Product not found. It may have been deleted.');
+      }
+      
       // Build update object with only provided fields
       const updateData: any = {};
       
-      // Only include fields that are explicitly provided
+      // Only include fields that are explicitly provided and not undefined
       if (updates.name !== undefined) updateData.name = updates.name;
       if (updates.company !== undefined) updateData.company = updates.company;
       if (updates.price !== undefined) updateData.price = updates.price;
@@ -411,12 +428,17 @@ export const useUpdateProduct = () => {
         .update(updateData)
         .eq('id', id)
         .select()
-        .single();
+        .maybeSingle();
       
       if (error) {
         console.error('Product update error:', error);
         throw error;
       }
+      
+      if (!data) {
+        throw new Error('Product update failed - no data returned');
+      }
+      
       console.log('Product updated successfully:', data);
       return data;
     },
@@ -451,6 +473,22 @@ export const useDeleteProduct = () => {
   return useMutation({
     mutationFn: async (id: string) => {
       console.log('Deleting product with ID:', id);
+      
+      // First check if the product exists
+      const { data: existingProduct, error: checkError } = await supabase
+        .from('products')
+        .select('id')
+        .eq('id', id)
+        .maybeSingle();
+      
+      if (checkError) {
+        console.error('Error checking product existence:', checkError);
+        throw new Error('Failed to verify product existence');
+      }
+      
+      if (!existingProduct) {
+        throw new Error('Product not found. It may have already been deleted.');
+      }
       
       const { error } = await supabase
         .from('products')

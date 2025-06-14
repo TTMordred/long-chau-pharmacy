@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Plus, Pencil, Trash2, Eye, Package, ArrowUpDown } from 'lucide-react';
 import {
   Card,
@@ -70,12 +70,18 @@ const ProductsManagement = () => {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [isConfirmingDelete, setIsConfirmingDelete] = useState<string | null>(null);
 
+  // Auto-refresh data when mutations complete
+  useEffect(() => {
+    if (createProduct.isSuccess || updateProduct.isSuccess || deleteProduct.isSuccess) {
+      refetch();
+    }
+  }, [createProduct.isSuccess, updateProduct.isSuccess, deleteProduct.isSuccess, refetch]);
+
   const handleCreateProduct = async (productData: ProductInput) => {
     try {
       await createProduct.mutateAsync(productData);
       setIsCreating(false);
-      // Force refetch to ensure UI is updated
-      await refetch();
+      // The useEffect above will handle the refetch
     } catch (error) {
       console.error('Failed to create product:', error);
     }
@@ -90,8 +96,7 @@ const ProductsManagement = () => {
         updates: productData,
       });
       setEditingProduct(null);
-      // Force refetch to ensure UI is updated
-      await refetch();
+      // The useEffect above will handle the refetch
     } catch (error) {
       console.error('Failed to update product:', error);
     }
@@ -101,11 +106,25 @@ const ProductsManagement = () => {
     try {
       await deleteProduct.mutateAsync(id);
       setIsConfirmingDelete(null);
-      // Force refetch to ensure UI is updated
-      await refetch();
+      // The useEffect above will handle the refetch
     } catch (error) {
       console.error('Failed to delete product:', error);
     }
+  };
+
+  const handleEditProduct = (product: Product) => {
+    // Ensure the product still exists before editing
+    const productExists = products?.find(p => p.id === product.id);
+    if (!productExists) {
+      toast({
+        title: "Product not found",
+        description: "This product may have been deleted. Refreshing the list.",
+        variant: "destructive",
+      });
+      refetch();
+      return;
+    }
+    setEditingProduct(product);
   };
 
   const getStatusBadge = (status: string) => {
@@ -316,7 +335,7 @@ const ProductsManagement = () => {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => setEditingProduct(product)}
+                          onClick={() => handleEditProduct(product)}
                         >
                           <Pencil className="h-4 w-4" />
                         </Button>
