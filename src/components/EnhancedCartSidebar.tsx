@@ -211,7 +211,7 @@ const EnhancedCartSidebar = ({ isOpen, onClose }: EnhancedCartSidebarProps) => {
                 {cartItems.length > 0 && (
                   <Button 
                     variant="outline" 
-                    onClick={clearCart}
+                    onClick={() => clearCart()}
                     className="w-full"
                   >
                     Clear Cart
