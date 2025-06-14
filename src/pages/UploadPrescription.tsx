@@ -108,6 +108,7 @@ const UploadPrescription = () => {
         prescription_image_url: publicUrl,
         pharmacist_notes: formData.pharmacistNotes,
         status: 'pending',
+        reviewed_at: null,
       });
 
       setUploadProgress(100);
