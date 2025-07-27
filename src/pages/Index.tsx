@@ -24,18 +24,19 @@ const IndexContent = () => {
   const { cartItemsCount, addToCart } = useCart();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-sage via-mint to-blue/20 relative overflow-hidden">
-      {/* Friendly animated background elements */}
+    <div className="min-h-screen bg-gradient-to-br from-sage/5 via-mint/3 to-blue/8 relative overflow-hidden">
+      {/* Enhanced friendly animated background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue/30 to-mint/40 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-sage/40 to-blue/30 rounded-full blur-3xl animate-pulse delay-1000"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-br from-mint/20 to-sage/30 rounded-full blur-3xl animate-pulse delay-2000"></div>
+        <div className="absolute -top-48 -right-48 w-96 h-96 bg-gradient-to-br from-blue/20 to-mint/30 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute -bottom-48 -left-48 w-96 h-96 bg-gradient-to-br from-sage/30 to-blue/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[32rem] h-[32rem] bg-gradient-to-br from-mint/15 to-sage/20 rounded-full blur-3xl animate-pulse delay-2000"></div>
         
-        {/* Floating decorative elements */}
-        <div className="absolute top-20 left-20 w-4 h-4 bg-blue rounded-full animate-pulse opacity-60"></div>
-        <div className="absolute top-40 right-32 w-6 h-6 bg-sage rounded-full animate-pulse delay-500 opacity-50"></div>
-        <div className="absolute bottom-32 left-1/3 w-3 h-3 bg-mint rounded-full animate-pulse delay-1000 opacity-70"></div>
-        <div className="absolute bottom-20 right-20 w-5 h-5 bg-navy/40 rounded-full animate-pulse delay-1500 opacity-60"></div>
+        {/* Enhanced floating decorative elements */}
+        <div className="absolute top-24 left-24 w-6 h-6 bg-blue/60 rounded-full animate-pulse opacity-70"></div>
+        <div className="absolute top-48 right-40 w-8 h-8 bg-sage/70 rounded-full animate-pulse delay-500 opacity-60"></div>
+        <div className="absolute bottom-40 left-1/3 w-5 h-5 bg-mint/80 rounded-full animate-pulse delay-1000 opacity-80"></div>
+        <div className="absolute bottom-24 right-24 w-7 h-7 bg-navy/50 rounded-full animate-pulse delay-1500 opacity-70"></div>
+        <div className="absolute top-1/3 left-16 w-4 h-4 bg-coral/60 rounded-full animate-pulse delay-2000 opacity-60"></div>
       </div>
 
       <DashboardHeader 
@@ -46,7 +47,7 @@ const IndexContent = () => {
       />
       
       <main className="relative z-10">
-        <div className="container mx-auto px-4 pt-24 pb-8">
+        <div className="container mx-auto px-6 pt-24 pb-12">
           <HeroSection />
           <StatsSection />
           <FeatureSection />
