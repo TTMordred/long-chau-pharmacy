@@ -14,7 +14,7 @@ import BlogPosts from "./pages/BlogPosts";
 import BlogPost from "./pages/BlogPost";
 import CMSDashboard from "./pages/CMSDashboard";
 import NotFound from "./pages/NotFound";
-import { PMSApp } from "./com/longchau/pms/main/PMSApp";
+import PMSDemo from "./pages/PMSDemo";
 
 const queryClient = new QueryClient();
 
@@ -34,7 +34,7 @@ const App = () => (
           <Route path="/blog" element={<BlogPosts />} />
           <Route path="/blog/:slug" element={<BlogPost />} />
           <Route path="/cms-dashboard" element={<CMSDashboard />} />
-          <Route path="/pms-demo" element={<PMSApp />} />
+          <Route path="/pms-demo" element={<PMSDemo />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
