@@ -48,7 +48,7 @@ export const PMSApp: React.FC = () => {
   const validatedPrescriptions = userPrescriptions.filter(p => p.status === 'approved');
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
