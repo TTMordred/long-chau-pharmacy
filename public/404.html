@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Long Chau Pharmacy</title>
+    <script>
+      // This script takes the current page and redirects to the root with the current path as a query parameter
+      const path = window.location.pathname + window.location.search + window.location.hash;
+      if (path !== '/') {
+        window.location.replace('/?redirect=' + encodeURIComponent(path));
+      }
+    </script>
+  </head>
+  <body>
+    <p>Redirecting...</p>
+  </body>
+</html>
