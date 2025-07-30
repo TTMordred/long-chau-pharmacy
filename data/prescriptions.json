@@ -1,0 +1,29 @@
+[
+  {
+    "id": "1",
+    "customerId": "user-1",
+    "prescriptionImageUrl": "/prescriptions/sample1.pdf",
+    "pharmacistNotes": null,
+    "status": "pending",
+    "uploadedAt": "2024-12-01T10:00:00Z",
+    "reviewedAt": null
+  },
+  {
+    "id": "2",
+    "customerId": "user-2",
+    "prescriptionImageUrl": "/prescriptions/sample2.jpg",
+    "pharmacistNotes": "Approved for 30 days supply",
+    "status": "approved",
+    "uploadedAt": "2024-11-30T15:30:00Z",
+    "reviewedAt": "2024-12-01T09:15:00Z"
+  },
+  {
+    "id": "3",
+    "customerId": "user-3",
+    "prescriptionImageUrl": "/prescriptions/sample3.pdf",
+    "pharmacistNotes": "Image quality too poor, please resubmit",
+    "status": "rejected",
+    "uploadedAt": "2024-11-29T14:20:00Z",
+    "reviewedAt": "2024-11-30T11:45:00Z"
+  }
+]
