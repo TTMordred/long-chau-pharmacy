@@ -80,21 +80,6 @@ const MainNavigation = ({ cartItemsCount, onCartClick }: MainNavigationProps) =>
     },
   ];
 
-  const adminMenuItems = isAdmin ? [
-    {
-      title: 'CMS Dashboard',
-      href: '/cms-dashboard',
-      icon: Settings,
-      subItems: [
-        { title: 'Prescriptions', href: '/cms-dashboard?tab=prescriptions', icon: FileText },
-        { title: 'Products', href: '/cms-dashboard?tab=products', icon: Package },
-        { title: 'Blog Posts', href: '/cms-dashboard?tab=blog', icon: BookOpen },
-        { title: 'Health Posts', href: '/cms-dashboard?tab=health', icon: Heart },
-        { title: 'Users', href: '/cms-dashboard?tab=users', icon: Users },
-      ],
-    },
-  ] : [];
-
   const NavLink = ({ href, children, className }: { href: string; children: React.ReactNode; className?: string }) => (
     <NavigationMenuLink
       className={cn(
@@ -138,38 +123,10 @@ const MainNavigation = ({ cartItemsCount, onCartClick }: MainNavigationProps) =>
             {/* Admin/CMS Menu - Only show for admin users */}
             {isAdmin && (
               <NavigationMenuItem>
-                <NavigationMenuTrigger 
-                  className={cn(
-                    "rounded-lg bg-transparent hover:bg-accent/80 hover:scale-105 transition-all duration-300 ease-out relative overflow-hidden group",
-                    isActiveRoute('/cms-dashboard') && "bg-accent text-accent-foreground shadow-sm"
-                  )}
-                >
-                  <div className="relative z-10 flex items-center">
-                    <Settings className="w-4 h-4 mr-2 transition-transform duration-200 group-hover:scale-110" />
-                    CMS Dashboard
-                  </div>
-                  <div className="absolute inset-0 bg-gradient-to-r from-blue/10 to-navy/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                </NavigationMenuTrigger>
-                <NavigationMenuContent className="animate-in fade-in-0 zoom-in-95 slide-in-from-top-2 duration-300">
-                  <div className="grid gap-2 p-6 w-80 bg-white/95 backdrop-blur-sm border border-gray-200/50 shadow-xl rounded-xl">
-                    <div className="grid gap-1">
-                      <h3 className="font-semibold leading-none mb-4 text-navy">Content Management</h3>
-                      {adminMenuItems[0]?.subItems?.map((subItem) => (
-                        <NavigationMenuLink
-                          key={subItem.title}
-                          className="block select-none space-y-1 rounded-lg p-3 leading-none no-underline outline-none transition-all duration-200 hover:bg-accent/50 hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground hover:scale-[1.02] relative overflow-hidden group"
-                          onClick={() => navigate(subItem.href)}
-                        >
-                          <div className="flex items-center space-x-3 relative z-10">
-                            <subItem.icon className="w-4 h-4 transition-transform duration-200 group-hover:scale-110" />
-                            <div className="text-sm font-medium leading-none">{subItem.title}</div>
-                          </div>
-                          <div className="absolute inset-0 bg-gradient-to-r from-blue/5 to-navy/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
-                        </NavigationMenuLink>
-                      ))}
-                    </div>
-                  </div>
-                </NavigationMenuContent>
+                <NavLink href="/cms-dashboard">
+                  <Settings className="w-4 h-4 mr-2 transition-transform duration-200 group-hover:scale-110" />
+                  CMS Dashboard
+                </NavLink>
               </NavigationMenuItem>
             )}
           </NavigationMenuList>
@@ -317,23 +274,22 @@ const MainNavigation = ({ cartItemsCount, onCartClick }: MainNavigationProps) =>
               </button>
 
               {isAdmin && (
-                <div className="space-y-2 border-t border-gray-200/50 pt-3 mt-3">
-                  <div className="px-4 py-2 text-sm font-semibold text-navy">Content Management</div>
-                  {adminMenuItems[0]?.subItems?.map((subItem) => (
-                    <button
-                      key={subItem.title}
-                      onClick={() => {
-                        navigate(subItem.href);
-                        setIsMobileMenuOpen(false);
-                      }}
-                      className="flex items-center space-x-3 w-full px-6 py-3 rounded-lg text-left transition-all duration-200 hover:bg-accent/50 hover:text-accent-foreground hover:scale-[1.02] relative overflow-hidden group"
-                    >
-                      <subItem.icon className="w-4 h-4 transition-transform duration-200 group-hover:scale-110" />
-                      <span className="font-medium">{subItem.title}</span>
-                      <div className="absolute inset-0 bg-gradient-to-r from-blue/5 to-navy/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
-                    </button>
-                  ))}
-                </div>
+                <button
+                  onClick={() => {
+                    navigate('/cms-dashboard');
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className={cn(
+                    "flex items-center space-x-3 w-full px-4 py-3 rounded-lg text-left transition-all duration-200 hover:scale-[1.02] relative overflow-hidden group",
+                    isActiveRoute('/cms-dashboard') 
+                      ? "bg-accent text-accent-foreground shadow-sm" 
+                      : "hover:bg-accent/50 hover:text-accent-foreground"
+                  )}
+                >
+                  <Settings className="w-4 h-4 transition-transform duration-200 group-hover:scale-110" />
+                  <span className="font-medium">CMS Dashboard</span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-blue/5 to-navy/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                </button>
               )}
 
               <div className="border-t border-gray-200/50 pt-3 mt-3">
