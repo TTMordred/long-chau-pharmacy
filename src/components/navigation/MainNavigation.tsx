@@ -9,7 +9,6 @@ import {
   Settings, 
   FileText, 
   BookOpen, 
-  Package,
   Users,
   ChevronDown,
   Menu,
@@ -111,14 +110,6 @@ const MainNavigation = ({ cartItemsCount, onCartClick }: MainNavigationProps) =>
                 </NavLink>
               </NavigationMenuItem>
             ))}
-
-            {/* PMS Demo Link */}
-            <NavigationMenuItem>
-              <NavLink href="/pms-demo">
-                <Package className="w-4 h-4 mr-2 transition-transform duration-200 group-hover:scale-110" />
-                PMS Demo
-              </NavLink>
-            </NavigationMenuItem>
 
             {/* Admin/CMS Menu - Only show for admin users */}
             {isAdmin && (
@@ -254,24 +245,6 @@ const MainNavigation = ({ cartItemsCount, onCartClick }: MainNavigationProps) =>
                   <div className="absolute inset-0 bg-gradient-to-r from-blue/5 to-navy/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
                 </button>
               ))}
-
-              {/* PMS Demo Mobile Link */}
-              <button
-                onClick={() => {
-                  navigate('/pms-demo');
-                  setIsMobileMenuOpen(false);
-                }}
-                className={cn(
-                  "flex items-center space-x-3 w-full px-4 py-3 rounded-lg text-left transition-all duration-200 hover:scale-[1.02] relative overflow-hidden group",
-                  isActiveRoute('/pms-demo') 
-                    ? "bg-accent text-accent-foreground shadow-sm" 
-                    : "hover:bg-accent/50 hover:text-accent-foreground"
-                )}
-              >
-                <Package className="w-4 h-4 transition-transform duration-200 group-hover:scale-110" />
-                <span className="font-medium">PMS Demo</span>
-                <div className="absolute inset-0 bg-gradient-to-r from-blue/5 to-navy/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
-              </button>
 
               {isAdmin && (
                 <button
