@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { PrescriptionUploadFrame } from '@/com/longchau/pms/ui/view/PrescriptionUploadFrame';
 import { PrescriptionValidationFrame } from '@/com/longchau/pms/ui/view/PrescriptionValidationFrame';
 import { OrderCreationFrame } from '@/com/longchau/pms/ui/view/OrderCreationFrame';
+import { StaffOrderingFrame } from '@/com/longchau/pms/ui/view/StaffOrderingFrame';
 import { InventoryManagementFrame } from '@/com/longchau/pms/ui/view/InventoryManagementFrame';
 import { FileBasedPrescriptionRepository } from '@/com/longchau/pms/persistence/file/FileBasedPrescriptionRepository';
 import { Prescription } from '@/com/longchau/pms/domain/Prescription';
@@ -115,7 +116,7 @@ export const PMSApp: React.FC = () => {
 
         {/* Main Content Tabs */}
         <Tabs defaultValue="upload" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="upload">
               📤 Task 3: Upload Prescription
             </TabsTrigger>
@@ -124,6 +125,9 @@ export const PMSApp: React.FC = () => {
             </TabsTrigger>
             <TabsTrigger value="order">
               🛒 Task 4: Create Order
+            </TabsTrigger>
+            <TabsTrigger value="staff-pos">
+              🏪 Staff POS Interface
             </TabsTrigger>
             <TabsTrigger value="inventory">
               📦 Task 7: Manage Inventory
@@ -176,6 +180,25 @@ export const PMSApp: React.FC = () => {
                 <OrderCreationFrame
                   customerId={currentUser.id}
                   validatedPrescriptions={validatedPrescriptions}
+                />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Staff POS Interface - Enhanced Task 4 Demo */}
+          <TabsContent value="staff-pos">
+            <Card>
+              <CardHeader>
+                <CardTitle>Staff Point-of-Sale Interface (Enhanced Task 4)</CardTitle>
+                <p className="text-sm text-gray-600">
+                  Complete staff ordering workflow with prescription validation, error handling, and order completion.
+                  Demonstrates business rule enforcement and user change handling.
+                </p>
+              </CardHeader>
+              <CardContent>
+                <StaffOrderingFrame
+                  customerId={currentUser.id}
+                  prescriptions={userPrescriptions}
                 />
               </CardContent>
             </Card>
